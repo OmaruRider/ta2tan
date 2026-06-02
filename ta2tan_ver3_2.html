@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="ja" class="notranslate" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#00c873">
+<title>ta²tan — Ver 3.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Grotesk:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00c873;
+  --green2: #00a85e;
+  --green3: #00e88a;
+  --green-pale: #e8fff4;
+  --green-pale2: #f0fff8;
+  --bg: #f5fdf9;
+  --card: #ffffff;
+  --border: #d4f0e4;
+  --text: #0d2318;
+  --text2: #3d7a5c;
+  --text3: #8fbfa8;
+  --red: #ff4d6d;
+  --red-pale: #ffeef1;
+  --yellow: #ffb800;
+  --yellow-pale: #fffbf0;
+  --r: 20px;
+  --r-sm: 12px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.04);
+}
+
+.dark-theme {
+  --bg: #071009;
+  --card: #0f1d12;
+  --border: #2a5038;
+  --text: #eaf6ef;
+  --text2: #7ecf9e;
+  --text3: #4a7a5e;
+  --green: #00d97a;
+  --green2: #00b865;
+  --green3: #00f598;
+  --green-pale: #133622;
+  --green-pale2: #162e1e;
+  --red-pale: #2e1018;
+  --yellow-pale: #2a2208;
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  padding-bottom: 100px;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* 花火キャンバスを完全固定し隙間を消去 */
+#firework-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 500;
+}
+
+/* ⚡ 爽快画面揺れ (小さくマイルドに調整) */
+@keyframes shake-step1 { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-1.5px, 1px) rotate(-0.2deg); } 75% { transform: translate(1.5px, -1px) rotate(0.2deg); } }
+@keyframes shake-step2 { 0%, 100% { transform: translate(0, 0); } 20%, 60% { transform: translate(-3px, 1.5px) rotate(-0.5deg); } 40%, 80% { transform: translate(3px, -1.5px) rotate(0.5deg); } }
+@keyframes shake-step3 { 0%, 100% { transform: translate(0, 0); } 10%, 90% { transform: translate(-4px, 3px) rotate(-1deg); } 20%, 80% { transform: translate(4px, -3px) rotate(1deg); } 30%, 50%, 70% { transform: translate(-6px, -2px) rotate(-1.5deg); } 40%, 60% { transform: translate(6px, 2px) rotate(1.5deg); } }
+.shake-light { animation: shake-step1 0.18s linear; }
+.shake-mid   { animation: shake-step2 0.22s linear; }
+.shake-heavy { animation: shake-step3 0.35s linear; }
+
+/* 🌟 背面のリズムレーダー (画面中央に固定) */
+.bg-radar-layer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 290px;
+  height: 290px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s, transform 0.2s;
+}
+.dark-theme .bg-radar-layer { opacity: 0.35; }
+
+.bg-radar-core {
+  position: relative;
+  width: 95px;
+  height: 95px;
+  background: var(--green-pale);
+  border-radius: 50%;
+  border: 3.5px solid var(--border);
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bg-radar-layer.pulse-active .bg-radar-core { transform: scale(1.45); background: var(--green3); box-shadow: 0 0 45px var(--green); }
+.bg-radar-core::before, .bg-radar-core::after, .bg-radar-wave-three { content: ''; position: absolute; inset: -3.5px; border: 4.5px solid var(--green); border-radius: 50%; opacity: 0; pointer-events: none; }
+.bg-radar-core::before { animation: tatan-1 2.2s infinite cubic-bezier(0.1, 0.8, 0.3, 1); }
+.bg-radar-core::after  { animation: tatan-2 2.2s infinite cubic-bezier(0.1, 0.8, 0.3, 1); }
+.bg-radar-wave-three   { animation: tatan-3 2.2s infinite cubic-bezier(0.1, 0.8, 0.3, 1); }
+.bg-radar-layer.paused { opacity: 0 !important; }
+
+@keyframes tatan-1 { 0% { transform: scale(1); opacity: 0; } 5% { transform: scale(1.6); opacity: 1; } 18% { transform: scale(2.6); opacity: 0; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes tatan-2 { 0% { transform: scale(1); opacity: 0; } 18% { transform: scale(1); opacity: 0; } 23% { transform: scale(1.8); opacity: 1; } 36% { transform: scale(3.0); opacity: 0; } 100% { transform: scale(3.0); opacity: 0; } }
+@keyframes tatan-3 { 0% { transform: scale(1); opacity: 0; } 36% { transform: scale(1); opacity: 0; } 41% { transform: scale(2.2); opacity: 1; border-color: var(--green3); } 75% { transform: scale(4.0); opacity: 0; } 100% { transform: scale(4.0); opacity: 0; } }
+
+/* トップバー */
+.topbar { background: var(--green); padding: 16px 20px 24px; position: relative; z-index: 10; }
+.topbar-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+.logo-sq { font-size: 13px; vertical-align: super; color: rgba(255,255,255,0.7); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.theme-toggle-btn { background: rgba(255, 255, 255, 0.22); border: 1.5px solid rgba(255, 255, 255, 0.4); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; cursor: pointer; }
+.theme-toggle-btn:active { background: rgba(255, 255, 255, 0.4); }
+.topbar-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+.topbar-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.topbar-avatar:active { transform: scale(1.1); }
+.hero-text { color: rgba(255,255,255,0.85); font-size: 12px; margin-bottom: 2px; }
+.hero-amount { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; }
+.hero-yen-box { margin-top: 4px; font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 700; font-family: 'DM Mono', monospace; }
+.topbar::after { content: ''; position: absolute; bottom: -20px; left: 0; right: 0; height: 40px; background: var(--green); border-radius: 0 0 50% 50% / 0 0 40px 40px; z-index: -1; }
+
+/* タブレイアウト */
+.tab-content { display: none; flex-direction: column; gap: 16px; padding: 32px 16px 20px; z-index: 1; }
+.tab-content.active { display: flex; }
+
+/* アンケートカード (Ver 3.0のシンプルでスタイリッシュなデザイン) */
+.q-card {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r); padding: 18px;
+  box-shadow: var(--shadow-card); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1; transform: translateY(0) scale(1); max-height: 580px; overflow: hidden; position: relative; z-index: 2;
+}
+.q-card.collapsed {
+  max-height: 0 !important; padding: 0 18px !important; margin: 0 !important; opacity: 0 !important;
+  transform: scale(0.85) translateY(-30px) !important; border-width: 0px !important; pointer-events: none;
+}
+
+.card-hdr { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; width: 100%; }
+.card-hdr-row1 { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.card-hdr-row2 { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+.creator-profile-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); padding: 4px 10px; border-radius: 20px; border: 1.2px solid var(--border); color: var(--text); font-weight: 800; font-size: 11px; }
+.creator-avatar-circle { width: 20px; height: 20px; border-radius: 50%; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; }
+.creator-avatar-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+.badge-target { background: var(--bg); color: var(--text2); font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 12px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 3px; transition: all 0.3s; }
+.badge-expired { background: var(--red); color: #fff; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 12px; animation: pulseRed 1.5s infinite; }
+@keyframes pulseRed { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+.card-txt { font-size: 15px; font-weight: 700; line-height: 1.65; color: var(--text); margin-bottom: 12px; letter-spacing: 0.02em; }
+
+.deadline-box { background: var(--bg); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.deadline-progress-container { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; margin-left: 10px; overflow: hidden; position: relative; }
+.deadline-progress-fill { height: 100%; background: var(--green); transition: width 0.3s ease; }
+.deadline-progress-fill.warning { background: var(--red); }
+
+/* 2択画像グリッド */
+.img-grid { display: flex; gap: 10px; margin-bottom: 14px; height: 120px; }
+.img-box { flex: 1; border-radius: var(--r-sm); overflow: hidden; position: relative; border: 1.5px solid var(--border); cursor: pointer; background: var(--bg); transition: transform 0.15s, border-color 0.15s; }
+.img-box:active { transform: scale(0.97); border-color: var(--green); }
+.img-box img { width: 100%; height: 100%; object-fit: cover; }
+.img-badge { position: absolute; bottom: 8px; left: 8px; background: rgba(0,200,115,0.9); color: #fff; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 6px; }
+
+/* 回答グリッド＆ボタン (ダークモード対応) */
+.btn-grid { display: flex; gap: 10px; }
+.choice-btn { flex: 1; padding: 14px 10px; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer; transition: all 0.15s; text-align: center; }
+.choice-btn:active { background: var(--green-pale); border-color: var(--green); transform: scale(0.97); }
+.dark-theme .q-card { border-color: #6ddd90; }
+.dark-theme .choice-btn { background: #163d24; border-color: #2a6040; color: #eaf6ef; }
+.dark-theme .choice-btn:active { background: #1a5030; border-color: var(--green); }
+.dark-theme .deadline-box { background: #111e16; }
+.dark-theme .creator-profile-badge { background: #111e16; }
+.dark-theme .deadline-progress-container { background: #2a4a35; }
+
+/* コメントとお気に入り */
+.comment-section { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.comment-trigger { background: none; border: none; color: var(--green2); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.fav-btn { background: var(--bg); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: transform 0.2s, background-color 0.2s; }
+.fav-btn:active { transform: scale(1.25); }
+.fav-btn.active { background: var(--red-pale); border-color: var(--red); color: var(--red); }
+
+.comment-box { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.comment-input { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; background: var(--bg); color: var(--text); resize: none; font-family: inherit; outline: none; }
+.comment-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text3); }
+.submit-comment-btn { padding: 6px 14px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+
+/* 集計表示 */
+.result-bar-container { margin-top: 8px; background: var(--bg); border-radius: var(--r-sm); overflow: hidden; height: 24px; position: relative; display: flex; }
+.result-fill-a { background: linear-gradient(90deg, var(--green), var(--green2)); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 800; color: #fff; transition: width 0.8s ease; }
+.result-fill-b { background: #dfece6; height: 100%; flex: 1; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 11px; font-weight: 800; color: #3d7a5c; transition: width 0.8s ease; }
+.dark-theme .result-fill-b { background: #253a30; color: #8fbfa8; }
+
+/* ポップアップ (黒枠フチ・立体化で視認性向上) */
+.rhythm-popup-text {
+  position: fixed; left: 50%; top: 48%; transform: translate(-50%, -50%) scale(0);
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif; font-weight: 900; color: #fff;
+  text-align: center; pointer-events: none; z-index: 600; opacity: 0; white-space: nowrap;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.rhythm-main-word { 
+  font-size: 68px; letter-spacing: -1px; line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 2.5px #000;
+  text-shadow: 1px 1px 0 #000, 2px 2px 0 #00c873, 3px 3px 0 #007a44, 0 6px 18px rgba(0,200,115,0.6);
+}
+.rhythm-sub-pts { 
+  font-size: 22px; font-weight: 800; color: #fff; 
+  -webkit-text-stroke: 1px #000;
+  text-shadow: 1px 1px 0 #000, 2px 2px 0 #00c873, 0 4px 10px rgba(0,200,115,0.5);
+}
+
+@keyframes rhythmFade {
+  0% { transform: translate(-50%, -20%) scale(0.8); opacity: 0; }
+  10% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  15% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(0.95); opacity: 0; }
+}
+.rhythm-popup-text.pop { animation: rhythmFade 2.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; } /* 0.5s延長 */
+
+.combo-float-text {
+  position: fixed; left: 50%; top: 48%; transform: translate(-50%, -50%) scale(0);
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif; font-weight: 900; color: #fff;
+  pointer-events: none; z-index: 610; opacity: 0; white-space: nowrap;
+  font-size: var(--combo-size, 42px); letter-spacing: -1px;
+  -webkit-text-stroke: 2px #000;
+  text-shadow: 1px 1px 0 #000, 2px 2px 0 #00c873, 3px 3px 0 #007a44, 0 8px 20px rgba(0,200,115,0.6);
+}
+.rainbow-text {
+  background: linear-gradient(to right, #ff4d6d, #ffb800, #00e88a, #3b8fff, #8b5cf6, #ff4d6d);
+  background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: rainbow-shift 1.2s linear infinite; text-shadow: none !important;
+  filter: drop-shadow(1px 1px 0 #000) drop-shadow(2px 2px 0 #000) drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+}
+@keyframes rainbow-shift { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+@keyframes comboFloatCenterUp {
+  0% { transform: translate(-50%, 20%) scale(0.8); opacity: 0; }
+  10% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  15% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  85% { transform: translate(-50%, -55%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -110%) scale(0.95); opacity: 0; }
+}
+.combo-float-text.pop { animation: comboFloatCenterUp 2.9s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards; } /* 0.5s延長 */
+
+.combo-tracker-badge {
+  background: var(--green-pale); border: 1px solid var(--border); color: var(--green2); font-size: 11px;
+  font-weight: 800; padding: 10px 14px; border-radius: 14px; font-family: 'DM Mono', monospace;
+  display: flex; justify-content: space-between; align-items: center; margin-top: 8px; position: relative; z-index: 5;
+}
+.mini-indicator { display: inline-flex; align-items: center; gap: 6px; }
+.mini-dot-pulse {
+  width: 8px; height: 8px; background: var(--green); border-radius: 50%;
+  animation: mini-wave 1.2s infinite ease-in-out;
+}
+@keyframes mini-wave { 0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(0,200,115,0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(0,200,115,0); } 100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(0,200,115,0); } }
+
+/* スレッド回答フォーカス画面 */
+.thread-focus-overlay { position: fixed; top: -40px; left: -40px; width: calc(100vw + 80px); height: calc(100vh + 80px); background: rgba(10,20,15,0.97); backdrop-filter: blur(8px); z-index: 400; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; opacity: 0; transition: opacity 0.3s ease; }
+.thread-focus-overlay.active { display: flex; opacity: 1; }
+.thread-focus-card { width: 100%; max-width: 380px; background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r); padding: 24px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 16px; }
+
+@keyframes card-shake { 0%,100%{transform:translate(0,0) rotate(0);} 15%{transform:translate(-4px,2px) rotate(-0.5deg);} 30%{transform:translate(4px,-2px) rotate(0.5deg);} 45%{transform:translate(-3px,1px) rotate(-0.3deg);} 60%{transform:translate(3px,-1px) rotate(0.3deg);} 75%{transform:translate(-2px,1px) rotate(-0.2deg);} 90%{transform:translate(2px,-1px) rotate(0.2deg);} }
+@keyframes card-float-in { 0%{opacity:0; transform:translateY(18px);} 100%{opacity:1; transform:translateY(0);} }
+.card-shaking { animation: card-shake 0.45s ease; }
+.card-content-float { animation: card-float-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.thread-cancel-btn { position: absolute; top: 56px; right: 20px; background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); width: 36px; height: 36px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.thread-cancel-btn:active { background: rgba(255,80,80,0.2); border-color: rgba(255,80,80,0.4); color: #ff6060; }
+
+/* ✍️ 投稿フォーム */
+.post-form-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 14px; }
+.form-label { font-size: 13px; font-weight: 800; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+.form-input, .form-select { width: 100%; padding: 12px; border-radius: var(--r-sm); border: 1.5px solid var(--border); background: var(--bg); color: var(--text); font-size: 13px; outline: none; font-family: inherit; }
+.form-input:focus, .form-select:focus { border-color: var(--green); }
+.toggle-switch-group { display: flex; background: var(--bg); border-radius: var(--r-sm); padding: 4px; border: 1.5px solid var(--border); }
+.toggle-tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; color: var(--text3); border: none; background: transparent; transition: all 0.2s; }
+.toggle-tab-btn.active { background: var(--green); color: #fff; box-shadow: 0 2px 8px rgba(0,200,115,0.25); }
+.thread-questions-list { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+.thread-question-item { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 14px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+.thread-q-remove { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--red); font-size: 16px; font-weight: 800; cursor: pointer; }
+.add-q-btn { border: 2px dashed var(--green); background: var(--green-pale); color: var(--green2); padding: 12px; border-radius: var(--r-sm); font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; transition: all 0.2s; }
+.privacy-group { display: flex; flex-direction: column; gap: 8px; }
+.privacy-options { display: flex; gap: 8px; }
+.privacy-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text2); font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; transition: all 0.2s; }
+.privacy-btn.selected { border-color: var(--green); background: var(--green-pale); color: var(--green2); }
+.submit-post-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--green), var(--green2)); border: none; border-radius: var(--r-sm); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(0,200,115,0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.submit-post-btn:active { transform: scale(0.98); }
+
+/* 📊 KASEGI & 収支ダッシュボード */
+.kasegi-board { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 12px; }
+.kasegi-grid { display: flex; gap: 10px; }
+.kasegi-metric { flex: 1; padding: 10px 8px; border-radius: var(--r-sm); display: flex; flex-direction: column; gap: 4px; border: 1.5px solid var(--border); }
+.kasegi-metric.earned { background: var(--green-pale2); border-color: var(--green); }
+.kasegi-metric.spent { background: var(--red-pale); border-color: var(--border); }
+.kasegi-metric.balance { background: var(--yellow-pale); border-color: var(--yellow); }
+.kasegi-val { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 900; line-height: 1.1; }
+.kasegi-lbl { font-size: 9px; font-weight: 800; color: var(--text2); letter-spacing: 0.3px; }
+.kasegi-chart-wrapper { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.kasegi-bar { height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; }
+.kasegi-bar-fill { background: linear-gradient(90deg, var(--green), var(--green2)); height: 100%; transition: width 0.5s ease; }
+
+/* 💳 チャージUI */
+.charge-box { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--r); padding: 16px; margin-top: 4px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-card); }
+.charge-title { font-size: 12px; font-weight: 900; color: var(--green2); display: flex; align-items: center; gap: 6px; }
+.charge-options-grid { display: flex; gap: 8px; }
+.charge-preset-btn { flex: 1; padding: 10px 4px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 12px; font-weight: 800; cursor: pointer; text-align: center; transition: all 0.2s; }
+.charge-preset-btn:active { background: var(--green-pale); border-color: var(--green); transform: scale(0.96); }
+.charge-pay-methods { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.charge-pay-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; color: #fff; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.pay-cc { background: #000; }
+.pay-mobile { background: #5a31f4; }
+.pay-stripe { background: #635bff; }
+.charge-pay-btn:active { transform: scale(0.97); opacity: 0.9; }
+
+/* ⚙️ 運営シミュレーター */
+.simulator-box { background: #1e293b; border: 2px solid #334155; border-radius: var(--r); padding: 16px; margin-top: 10px; color: #f8fafc; }
+.sim-title { font-size: 13px; font-weight: 900; color: #38bdf8; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.sim-admin-badge { background: #0284c7; color: #fff; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+.sim-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.sim-header-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 800; }
+.sim-slider { width: 100%; height: 6px; border-radius: 3px; outline: none; background: #475569; -webkit-appearance: none; appearance: none; }
+.sim-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #38bdf8; cursor: pointer; }
+.sim-alert-box { background: #0f172a; border: 1.5px solid #334155; padding: 10px; border-radius: var(--r-sm); font-size: 11px; line-height: 1.4; font-weight: 700; color: #e2e8f0; }
+
+/* 👤 プロフィール・趣味ピル */
+.avatar-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 14px; }
+.avatar-item { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; background: var(--bg); transition: all 0.2s; }
+.avatar-item.selected { border-color: var(--green); background: var(--green-pale); transform: scale(1.12); box-shadow: 0 4px 10px rgba(0,200,115,0.25); }
+.hobby-checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 6px; }
+.hobby-check-label { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1.5px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; user-select: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.hobby-check-label input { display: none; }
+.hobby-check-label.checked { background: var(--green-pale); border-color: var(--green); color: var(--green2); box-shadow: 0 2px 8px rgba(0,200,115,0.1); }
+.location-row { display: flex; flex-direction: column; gap: 12px; }
+.history-filter-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+.filter-btn { flex: 1; padding: 6px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--card); font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text3); }
+.filter-btn.active { background: var(--green-pale); border-color: var(--green); color: var(--green2); }
+
+/* 🎯 待機画面 */
+.matching-waiting-box { background: var(--card); border-radius: var(--r); padding: 48px 24px; text-align: center; border: 1.5px solid var(--border); box-shadow: var(--shadow-card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 2; position: relative; min-height: 360px; margin: auto 0; }
+.matching-waiting-ring { position: relative; width: 90px; height: 90px; background: var(--green-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.matching-waiting-ring::before, .matching-waiting-ring::after, .matching-core-wave { content: ''; position: absolute; border: 12px solid rgba(0, 220, 130, 0.25); border-radius: 50%; opacity: 0; pointer-events: none; }
+.matching-waiting-ring::before { animation: wait-in-1 2.2s infinite cubic-bezier(0.7, 0.2, 0.9, 0.9); }
+.matching-waiting-ring::after  { animation: wait-in-2 2.2s infinite cubic-bezier(0.7, 0.2, 0.9, 0.9); }
+.matching-core-wave            { animation: wait-in-3 2.2s infinite cubic-bezier(0.7, 0.2, 0.9, 0.9); }
+
+@keyframes wait-in-1 {
+  0%   { inset: -70px; opacity: 0; }
+  8%   { inset: -70px; opacity: 0.9; }
+  50%  { inset: -16px; opacity: 0.6; }
+  64%  { inset: -4px;  opacity: 0; }
+  100% { inset: -4px;  opacity: 0; }
+}
+@keyframes wait-in-2 {
+  0%,  22% { inset: -110px; opacity: 0; }
+  30%  { inset: -110px; opacity: 0.8; }
+  72%  { inset: -16px;  opacity: 0.5; }
+  84%  { inset: -4px;   opacity: 0; }
+  100% { inset: -4px;   opacity: 0; }
+}
+@keyframes wait-in-3 {
+  0%,  45% { inset: -155px; opacity: 0; }
+  55%  { inset: -155px; opacity: 0.7; }
+  92%  { inset: -16px;  opacity: 0.4; }
+  100% { inset: -4px;   opacity: 0; }
+}
+.matching-waiting-text { font-size: 15px; font-weight: 900; color: var(--text2); letter-spacing: 0.5px; }
+.matching-waiting-sub { font-size: 11px; color: var(--text3); line-height: 1.5; max-width: 280px; }
+
+/* ⚠️ maNei低下警告バナー */
+.manei-warning-banner {
+  display: none;
+  background: linear-gradient(135deg, #fff3cd, #ffe8a0);
+  border: 1.5px solid var(--yellow);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  gap: 10px;
+  align-items: flex-start;
+}
+.dark-theme .manei-warning-banner {
+  background: linear-gradient(135deg, #2d2410, #3a2e10);
+  border-color: #b07a00;
+}
+.manei-warning-banner.visible { display: flex; }
+.manei-warning-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.manei-warning-body { display: flex; flex-direction: column; gap: 3px; }
+.manei-warning-title { font-size: 12px; font-weight: 900; color: #7a5200; }
+.dark-theme .manei-warning-title { color: #f0c040; }
+.manei-warning-desc { font-size: 11px; font-weight: 700; color: #9a6800; line-height: 1.5; }
+.dark-theme .manei-warning-desc { color: #c09030; }
+
+/* 📌 スティッキーmaNeiバッジ */
+.sticky-manei-badge {
+  position: fixed; bottom: 80px; right: 14px; z-index: 200;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 8px 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  opacity: 0; transform: translateY(10px) scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.sticky-manei-badge.visible { opacity: 1; transform: translateY(0) scale(1); }
+.sticky-manei-val { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 900; color: var(--green); line-height: 1; }
+.sticky-combo-val { font-size: 10px; font-weight: 800; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+/* 📱 下部ナビバー */
+.nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--card); border-top: 1.5px solid var(--border); display: flex; height: 68px; padding-bottom: env(safe-area-inset-bottom); z-index: 100; box-shadow: 0 -4px 16px rgba(0,0,0,0.03); }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: var(--text3); cursor: pointer; gap: 4px; transition: color 0.2s; }
+.nav-item.active { color: var(--green); }
+.nav-icon { font-size: 18px; }
+</style>
+</head>
+<body>
+
+<canvas id="firework-canvas"></canvas>
+
+<div class="bg-radar-layer" id="bg-radar">
+  <div class="bg-radar-core"><div class="bg-radar-wave-three"></div></div>
+</div>
+
+<div class="rhythm-popup-text" id="rhythm-text">
+  <div class="rhythm-main-word" id="rhythm-word">ta!</div>
+  <div class="rhythm-sub-pts" id="rhythm-pts">+100maNei</div>
+</div>
+<div class="combo-float-text" id="combo-float-text">1 ta²tan!</div>
+<div class="sticky-manei-badge" id="sticky-manei-badge">
+  <div class="sticky-manei-val" id="sticky-manei-val">0 maNei</div>
+  <div class="sticky-combo-val" id="sticky-combo-val">Combo: Ready</div>
+</div>
+<div id="cancel-manei-float" style="position:fixed; left:50%; top:48%; transform:translate(-50%,-50%); pointer-events:none; z-index:700; opacity:0; font-family:'Space Grotesk',sans-serif; font-weight:900; font-size:36px; color:#fff; -webkit-text-stroke:1.5px #000; text-shadow:1px 1px 0 #000, 2px 2px 0 #ff4d6d, 3px 3px 0 #a00030, 0 6px 16px rgba(255,77,109,0.7); white-space:nowrap;"></div>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <div class="logo">ta<span class="logo-sq">²</span>tan</div>
+    <div class="topbar-right">
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="テーマ切り替え">🌗</button>
+      <div class="topbar-avatar" id="topbar-avatar-display" onclick="switchTab('profile')">👤</div>
+    </div>
+  </div>
+  <div class="hero-text">現在の実保有maNei</div>
+  <div class="hero-amount" id="total-points">4,040</div>
+  <div class="hero-yen-box" id="total-yen">≒ ¥40.40</div>
+</div>
+
+<div class="thread-focus-overlay" id="thread-focus-modal">
+  <div class="thread-focus-card" id="thread-focus-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span class="sponsor" id="thread-focus-sponsor" style="font-weight:800; color:var(--green2)">STARBUCKS</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge-target" id="thread-focus-progress">Step: 1 / 3</span>
+        <button onclick="cancelThreadFocus()" style="background:rgba(255,77,109,0.12); border:1.5px solid rgba(255,77,109,0.35); color:#ff4d6d; width:28px; height:28px; border-radius:50%; font-size:13px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;" title="途中でやめる">✕</button>
+      </div>
+    </div>
+    <div class="card-txt" id="thread-focus-text">Q1: スレッド質問</div>
+    <div class="deadline-box" style="margin-bottom:0;">
+      <span>回答期限 (3日間)</span>
+      <div class="deadline-progress-container" style="max-width:180px;"><div class="deadline-progress-fill" style="width:100%"></div></div>
+    </div>
+    <div class="btn-grid" style="margin-top: 12px;">
+      <button class="choice-btn" id="thread-focus-btn-a" onclick="submitThreadFocusChoice('A')">A</button>
+      <button class="choice-btn" id="thread-focus-btn-b" onclick="submitThreadFocusChoice('B')">B</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📬 ポスト -->
+<div id="view-timeline" class="tab-content active">
+  <div class="section-title" style="font-size: 15px; font-weight: 900; margin-bottom: 4px;">📬 ポスト</div>
+  <p class="section-desc" style="font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4;">すべてのコンテンツは公平にリーチします。</p>
+  
+  <div style="display:flex; gap:8px;">
+    <button class="add-q-btn" style="flex:1; border-color:var(--red); color:var(--red); background:var(--red-pale);" onclick="simulateThreeDaysPass()">
+      ⏳ 3日進めて回答期限切れ(画面から消去)を検証
+    </button>
+  </div>
+
+  <div class="manei-warning-banner" id="manei-warning-banner">
+    <div class="manei-warning-icon">⚠️</div>
+    <div class="manei-warning-body">
+      <div class="manei-warning-title">本日の獲得maNeiが下がっています</div>
+      <div class="manei-warning-desc">10 ta²tan! を達成したため、1回答あたり <b>1 maNei</b> になっています。明日リセットされます。</div>
+    </div>
+  </div>
+
+  <div class="combo-tracker-badge" id="combo-badge">
+    <span class="mini-indicator"><span class="mini-dot-pulse"></span><span>Combo: Ready ⚡</span></span><span>Next: ta!</span>
+  </div>
+
+  <div style="display:flex; align-items:center; justify-content:space-between; background:var(--card); border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; font-family:'DM Mono', monospace;">
+    <span style="font-size:11px; font-weight:800; color:var(--text3);">📋 残りアンケート</span>
+    <span style="display:flex; align-items:baseline; gap:4px;">
+      <span id="remaining-q-count" style="font-family:'Space Grotesk', sans-serif; font-size:22px; font-weight:900; color:var(--green);">0</span>
+      <span style="font-size:11px; font-weight:800; color:var(--text3);">問</span>
+    </span>
+    <span style="font-size:10px; font-weight:800; color:var(--text3);">30問でボーナス🎯<br><span id="bonus-progress-text" style="color:var(--green2);">あと30問</span></span>
+  </div>
+  
+  <div id="timeline-cards-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+</div>
+
+<!-- ✍️ 投稿フォーム (Ver 3.0 のまま変更なし) -->
+<div id="view-post" class="tab-content">
+  <div class="section-title" style="font-size: 15px; font-weight: 900;">✍️ ユーザーアンケート配布</div>
+  <p class="section-desc" style="font-size: 11px; color: var(--text3); line-height: 1.5;">
+    <b>フォロワー数、バズ、大手SNSのアルゴリズムは不要です。</b><br>
+    maNeiを消費するだけで、ターゲットのタイムラインへ有名企業とフラットに<b>100%確実に直接届き、必ず50回答と生の声が返ってきます。</b>
+  </p>
+  
+  <div class="post-form-card">
+    <div class="form-label">📊 投稿形式</div>
+    <div class="toggle-switch-group">
+      <button class="toggle-tab-btn active" id="type-single-btn" onclick="setPostType('single')">単発アンケート</button>
+      <button class="toggle-tab-btn" id="type-thread-btn" onclick="setPostType('thread')">スレッド (最大30問)</button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div class="form-label">🎯 対象年齢層</div>
+        <select id="post-target-age" class="form-select">
+          <option value="すべて">すべて</option>
+          <option value="10代のみ">10代のみ</option>
+          <option value="20代〜">20代〜</option>
+          <option value="30代〜">30代〜</option>
+          <option value="40代〜">40代〜</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">🎯 対象ジャンル / 趣味</div>
+        <select id="post-target-hobby" class="form-select">
+          <option value="すべて">すべて</option>
+          <option value="ガジェット">ガジェット</option>
+          <option value="グルメ">グルメ</option>
+          <option value="ファッション">ファッション</option>
+          <option value="ライフスタイル">ライフスタイル</option>
+          <option value="エンタメ">エンタメ</option>
+          <option value="ゲーム">ゲーム</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="font-size:11px; background:var(--green-pale); padding:8px 12px; border-radius:8px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-weight:700; color:var(--green2);">💰 消費予定maNei (時価):</span>
+      <span id="post-cost-indicator" style="font-family:'Space Grotesk'; font-weight:800; color:var(--green2)">5,000 maNei</span>
+    </div>
+
+    <div>
+      <div class="form-label">🏷️ 配信者名</div>
+      <input type="text" id="post-sponsor" class="form-input" value="マイアカウント">
+    </div>
+
+    <div>
+      <div class="form-label">⏱️ 配布回答期限 (集計期間)</div>
+      <select id="post-expire-days" class="form-select">
+        <option value="3">標準 (3日間で無回答移譲)</option>
+        <option value="1">短期集中 (1日間)</option>
+        <option value="7">ゆったり (7日間)</option>
+        <option value="14">じっくり (14日間)</option>
+        <option value="30">長期集計 (30日間)</option>
+      </select>
+    </div>
+
+    <div id="single-question-form">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <div class="form-label">❓ 質問内容</div>
+          <input type="text" id="post-q-text" class="form-input" placeholder="新商品のパッケージ、どっちが好き？">
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div><div class="form-label">A案 選択肢</div><input type="text" id="post-opt-a" class="form-input" value="A案"></div>
+          <div><div class="form-label">B案 選択肢</div><input type="text" id="post-opt-b" class="form-input" value="B案"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="thread-question-form" style="display:none;">
+      <div class="form-label">📚 スレッド内の質問 (<span id="thread-count">1</span> / 30問)</div>
+      <div class="thread-questions-list" id="thread-questions-container"></div>
+      <button class="add-q-btn" style="margin-top:10px;" onclick="addThreadQuestionField()">＋ 質問を追加する</button>
+    </div>
+
+    <div class="privacy-group">
+      <div class="form-label">🔒 集計結果の公開</div>
+      <div class="privacy-options">
+        <button class="privacy-btn selected" id="privacy-private-btn" onclick="setPrivacy('private')">非公開<br>(分析のみ)</button>
+        <button class="privacy-btn" id="privacy-public-btn" onclick="setPrivacy('public')">結果を公開<br>(話題の結果広場)</button>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; align-items:flex-start; font-size:11px; color:var(--text2); background:var(--green-pale); padding:10px; border-radius:8px;">
+      <input type="checkbox" id="cost-consent-chk" style="margin-top:2px;" checked>
+      <label for="cost-consent-chk" style="cursor:pointer; line-height:1.4;">現在の時価コストによるアンケート配信に同意します。キャンセル・回答期限切れの場合でも返金はございません。</label>
+    </div>
+
+    <button class="submit-post-btn" onclick="submitNewQuestion()"><span>🚀 maNeiを消費してタイムラインへ配信</span></button>
+  </div>
+</div>
+
+<!-- 📊 モニタータブ -->
+<div id="view-monitor" class="tab-content">
+  <div class="section-title" style="font-size: 15px; font-weight: 900;">📊 配布モニター</div>
+  <p class="section-desc" style="font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4;">あなたが配布したアンケートのリアルタイム回答状況を確認できます。</p>
+  <div id="my-posted-list" style="display:flex; flex-direction:column; gap:16px; margin-bottom: 24px;"></div>
+
+  <div class="section-title" style="font-size: 15px; font-weight: 900; margin-top: 10px;">🔥 コミュニティの話題</div>
+  <p class="section-desc" style="font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4;">全体公開された他のユーザーや企業のトレンド回答データです。</p>
+  <div id="hot-list" style="display:flex; flex-direction:column; gap:16px;"></div>
+</div>
+
+<div id="view-kasegi" class="tab-content">
+  <div class="section-title" style="font-size: 15px; font-weight: 900;">👛 KASEGIと履歴</div>
+  <p class="section-desc" style="font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4;">これまでに獲得・消費したmaNeiの管理、各種PayでのmaNei購入、および回答履歴を確認できます。</p>
+  
+  <div class="kasegi-board">
+    <div class="kasegi-grid">
+      <div class="kasegi-metric earned"><span class="kasegi-lbl">獲得累計maNei</span><span class="kasegi-val" id="kasegi-total-earned" style="color:var(--green)">+32,400maNei</span></div>
+      <div class="kasegi-metric spent"><span class="kasegi-lbl">消費累計maNei</span><span class="kasegi-val" id="kasegi-total-spent" style="color:var(--red)">-28,360maNei</span></div>
+    </div>
+    <div class="kasegi-metric balance" style="width:100%;"><span class="kasegi-lbl">現在の実保有バランス</span><span class="kasegi-val" id="kasegi-balance" style="color:var(--yellow); font-size:24px;">4,040 maNei</span></div>
+    <div class="kasegi-chart-wrapper">
+      <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:800; color:var(--text3);"><span>保有効率比</span><span id="kasegi-efficiency">60%</span></div>
+      <div class="kasegi-bar"><div class="kasegi-bar-fill" id="kasegi-bar-fill" style="width: 60%;"></div></div>
+    </div>
+  </div>
+
+  <div class="charge-box">
+    <div class="charge-title">⚡ maNeiをチャージ (入金・購入)</div>
+    <div class="charge-options-grid">
+      <button class="charge-preset-btn" onclick="executeCharge(3000)">3,000 maNei<br><span style="font-size:10px; opacity:0.8;">(¥30)</span></button>
+      <button class="charge-preset-btn" onclick="executeCharge(5000)">5,000 maNei<br><span style="font-size:10px; opacity:0.8;">(¥50)</span></button>
+      <button class="charge-preset-btn" onclick="executeCharge(10000)">10,000 maNei<br><span style="font-size:10px; opacity:0.8;">(¥100)</span></button>
+    </div>
+    <div class="charge-pay-methods">
+      <button class="charge-pay-btn pay-cc" onclick="executeChargeWithPay('Credit Card')">💳 Credit Card</button>
+      <button class="charge-pay-btn pay-mobile" onclick="executeChargeWithPay('各種Pay')">📱 Apple / Google Pay</button>
+      <button class="charge-pay-btn pay-stripe" onclick="executeChargeWithPay('PayPay')">💰 PayPay</button>
+    </div>
+  </div>
+
+  <div class="simulator-box">
+    <div class="sim-title"><span>⚙️ 運営専用：収支設計シミュレーター</span><span class="sim-admin-badge">Admin</span></div>
+    <div class="sim-row" style="background:#0f172a; padding:10px; border-radius:8px; margin-bottom:14px; border: 1px solid #334155;">
+      <div class="sim-header-row"><span style="color:var(--yellow)">📈 単発アンケート配信コスト (時価)</span><span id="sim-market-price-lbl" style="color:#38bdf8; font-weight:900;">5,000 maNei</span></div>
+      <input type="range" id="sim-market-price-slider" class="sim-slider" min="1000" max="10000" step="100" value="5000" oninput="updateMarketPriceSingle(this.value)">
+    </div>
+    <div class="sim-row">
+      <div class="sim-header-row"><span>1日の企業回答 (原価: 10円/1k maNei)</span><span id="sim-corp-lbl" style="color:#38bdf8">5問 (5,000maNei)</span></div>
+      <input type="range" id="sim-corp-slider" class="sim-slider" min="0" max="20" value="5" oninput="runSimulateObservation()">
+    </div>
+    <div class="sim-row">
+      <div class="sim-header-row"><span>1日のユーザー回答 (報酬: 100maNei)</span><span id="sim-user-lbl" style="color:#38bdf8">15問 (1,500maNei)</span></div>
+      <input type="range" id="sim-user-slider" class="sim-slider" min="0" max="40" value="15" oninput="runSimulateObservation()">
+    </div>
+    <div class="sim-row">
+      <div class="sim-header-row"><span>週の自己アンケート配信 (-時価/回)</span><span id="sim-post-lbl" style="color:#ff4d6d">2回 (-10,000maNei)</span></div>
+      <input type="range" id="sim-post-slider" class="sim-slider" min="0" max="7" value="2" oninput="runSimulateObservation()">
+    </div>
+    <div class="sim-alert-box" id="sim-diagnostic-text">収支バランス観察中...</div>
+  </div>
+
+  <div class="section-title" style="margin-top: 14px;">💳 Stripe 現金化 (¥)</div>
+  <div style="background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px;">
+    <div style="font-size:11px; font-weight:800; color:var(--text2); margin-bottom:4px;">現金化可能残高</div>
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <div style="font-family:'Space Grotesk'; font-size:28px; font-weight:900;" id="profile-points">4,040</div>
+      <div style="font-size:14px; font-weight:800; color:var(--text3);">maNei</div>
+    </div>
+    <button class="submit-post-btn" style="margin-top:12px; padding:12px; font-size:12px;" onclick="alertSimulateWithdraw()">Stripeで銀行口座へ払い出し申請</button>
+  </div>
+
+  <div class="section-title" style="margin-top: 20px;">📝 あなたの回答履歴</div>
+  <div class="history-filter-tabs">
+    <button class="filter-btn active" id="hist-filter-all" onclick="setHistoryFilter('all')">すべて表示</button>
+    <button class="filter-btn" id="hist-filter-fav" onclick="setHistoryFilter('fav')">🩵 お気に入り</button>
+  </div>
+  <div id="view-history" style="display:flex; flex-direction:column; gap:16px;"></div>
+</div>
+
+<div id="view-profile" class="tab-content">
+  <div class="section-title" style="font-size: 15px; font-weight: 900;">👤 プロフィール設定</div>
+  <p class="section-desc" style="font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4;">アバターや興味・居住地を設定します。条件が合致したアンケートのみが自動配信されます。</p>
+
+  <div class="post-form-card" style="margin-bottom: 12px;">
+    <div>
+      <div class="form-label">🎭 アバターアイコン選択</div>
+      <div class="avatar-grid" id="profile-avatar-grid"></div>
+    </div>
+
+    <div>
+      <div class="form-label">🖼️ アバター画像をアップロード (任意)</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <label class="add-q-btn" style="flex:1; cursor:pointer; padding:12px 10px; margin:0;">
+          📁 画像ファイルを選択
+          <input type="file" id="profile-image-upload" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+        </label>
+        <button id="profile-image-clear-btn" class="add-q-btn" style="flex:none; border-color:var(--red); color:var(--red); background:var(--red-pale); padding:12px; display:none;" onclick="clearProfileImage()">削除</button>
+      </div>
+      <div id="profile-image-preview-desc" style="font-size:10px; color:var(--text3); margin-top:6px; font-weight:700;"></div>
+    </div>
+
+    <div style="margin-top:6px;">
+      <div class="form-label">🏷️ ユーザーネーム</div>
+      <input type="text" id="profile-username-input" class="form-input" value="マイアカウント" oninput="updateProfileName(this.value)">
+    </div>
+    
+    <div>
+      <div class="form-label">🎂 あなたの年齢層</div>
+      <select id="profile-age-select" class="form-select" onchange="updateProfileAge(this.value)">
+        <option value="すべて">すべて</option>
+        <option value="10代のみ">10代のみ</option>
+        <option value="20代〜">20代〜</option>
+        <option value="30代〜">30代〜</option>
+        <option value="40代〜">40代〜</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="form-label">🎨 興味・属性ジャンル (最大5種)</div>
+      <div class="hobby-checkbox-grid" id="profile-hobbies-container"></div>
+      <div style="font-size:10px; color:var(--text3); font-weight:700; text-align:right; margin-top:6px;" id="hobby-count-lbl">選択中: 1 / 5 種</div>
+    </div>
+
+    <div class="location-row">
+      <div>
+        <div class="form-label">🏡 お住まいの都道府県 (任意)</div>
+        <input type="text" id="profile-state-input" class="form-input" placeholder="例: 東京都" oninput="updateProfileState(this.value)">
+      </div>
+      <div>
+        <div class="form-label">🏙️ 市区町村 (任意)</div>
+        <input type="text" id="profile-city-input" class="form-input" placeholder="例: 渋谷区" oninput="updateProfileCity(this.value)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="nav-bar">
+  <div class="nav-item active" id="nav-timeline" onclick="switchTab('timeline')"><span class="nav-icon">📬</span><span>ポスト</span></div>
+  <div class="nav-item" id="nav-post" onclick="switchTab('post')"><span class="nav-icon">✍️</span><span>配布</span></div>
+  <div class="nav-item" id="nav-monitor" onclick="switchTab('monitor')"><span class="nav-icon">📊</span><span>モニター</span></div>
+  <div class="nav-item" id="nav-kasegi" onclick="switchTab('kasegi')"><span class="nav-icon">👛</span><span>KASEGI</span></div>
+  <div class="nav-item" id="nav-profile" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span>プロフ</span></div>
+</nav>
+
+<script>
+const presetImages = {
+  coffee: { a: "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=200&q=80", b: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&q=80" },
+  snack: { a: "https://images.unsplash.com/photo-1556881286-fc6915169721?w=200&q=80", b: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200&q=80" }
+};
+
+let userProfile = { name: "マイアカウント", avatar: "👤", avatarImage: null, age: "20代〜", hobbies: ["ライフスタイル"], state: "", city: "" };
+const avatarPool = ["👤", "🐱", "🐻", "🦊", "🐼", "🦁", "🤖", "👾", "👽", "🤠", "🎨", "🛍️", "👟", "🍟", "☕", "🚗", "📱", "🎮", "🎬"];
+const hobbyOptions = ["ガジェット", "グルメ", "ファッション", "ライフスタイル", "エンタメ", "ゲーム", "旅行", "スポーツ", "美容", "ビジネス", "アート", "音楽"];
+let marketPriceSingle = 5000;
+let totalAnswerClicks = 0;
+
+// テスト用アンケート30問
+const initialQuestions = [
+  { id: 301, type: 'text', sponsor: 'Calbee', isCorporate: true, creatorAvatar: '🍟', creatorAvatarImage: null, text: '新発売のポテトチップス、最初に食べるならどっち？', options: ['うすしお味', 'コンソメパンチ'], votesA: 840, votesB: 510, isThread: false, expireDays: 3, remainingPercent: 100, isExpired: false, targetAge: 'すべて', targetHobby: 'グルメ' },
+  { id: 302, type: 'image', sponsor: 'SUNTORY', isCorporate: true, creatorAvatar: '☕', creatorAvatarImage: null, text: 'クラフトボスの新ボトルデザイン、手元に置くならどっちが良い？', imgA: presetImages.snack.a, imgB: presetImages.snack.b, votesA: 1420, votesB: 980, isThread: false, expireDays: 3, remainingPercent: 75, isExpired: false, targetAge: '20代〜', targetHobby: 'ライフスタイル' },
+  { id: 303, type: 'text', sponsor: 'FamilyMart', isCorporate: true, creatorAvatar: '🛍️', creatorAvatarImage: null, text: 'ファミチキを食べる頻度はどれくらい？', options: ['週1回以上', '月に数回'], votesA: 980, votesB: 640, isThread: false, expireDays: 3, remainingPercent: 50, isExpired: false, targetAge: 'すべて', targetHobby: 'グルメ' },
+  { id: 304, type: 'text', sponsor: 'りゅう', isCorporate: false, creatorAvatar: '🚗', creatorAvatarImage: null, text: '旅行に行くなら、どちらの移動手段が好き？', options: ['新幹線・特急で行く', '自分の車でドライブ'], votesA: 32, votesB: 18, isThread: false, expireDays: 3, remainingPercent: 90, isExpired: false, targetAge: '20代〜', targetHobby: 'ライフスタイル' },
+  { id: 305, type: 'thread', sponsor: 'STARBUCKS', isCorporate: true, creatorAvatar: '☕', creatorAvatarImage: null, isThread: true, expireDays: 3, remainingPercent: 100, isExpired: false, targetAge: 'すべて', targetHobby: 'グルメ', steps: [ { text: 'Q1: 夏の新作フラペチーノ、ベースにするならどっちが好き？', options: ['抹茶クリームベース', '完熟メロンフローズン'] }, { text: 'Q2: トッピングのホイップクリーム量は？', options: ['エクストラ(多め)', 'ノーマル'] }, { text: 'Q3: パッケージカップの限定ロゴアートは？', options: ['トロピカルグラフィティ', 'パステルレトロ'] } ], votesList: [ { votesA: 620, votesB: 340 }, { votesA: 420, votesB: 540 }, { votesA: 710, votesB: 250 } ] },
+  { id: 306, type: 'text', sponsor: 'マクドナルド', isCorporate: true, creatorAvatar: '🍔', creatorAvatarImage: null, text: 'ハンバーガーのセット、サイドメニューはどっちを選ぶ？', options: ['ポテト', 'ナゲット'], votesA: 5000, votesB: 2000, isThread: false, expireDays: 3, remainingPercent: 80, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて' },
+  { id: 307, type: 'text', sponsor: 'SONY', isCorporate: true, creatorAvatar: '🎧', creatorAvatarImage: null, text: '普段音楽を聴くときによく使うのは？', options: ['完全ワイヤレスイヤホン', 'ヘッドホン'], votesA: 4000, votesB: 1500, isThread: false, expireDays: 3, remainingPercent: 90, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて' },
+  { id: 308, type: 'thread', sponsor: 'UNIQLO', isCorporate: true, creatorAvatar: '👕', creatorAvatarImage: null, isThread: true, expireDays: 3, remainingPercent: 70, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて', steps: [ { text: 'Q1: アウターの色はどっちが好き？', options: ['ブラック/ネイビー', 'ベージュ/ホワイト'] }, { text: 'Q2: サイズ感は？', options: ['ジャストサイズ', 'オーバーサイズ'] }, { text: 'Q3: 買い替えの頻度は？', options: ['毎シーズン', 'ボロボロになるまで'] } ], votesList: [ { votesA: 100, votesB: 200 }, { votesA: 150, votesB: 150 }, { votesA: 50, votesB: 250 } ] },
+  { id: 309, type: 'text', sponsor: 'ユーザーA', isCorporate: false, creatorAvatar: '🐶', creatorAvatarImage: null, text: '犬と猫、どっち派？', options: ['犬', '猫'], votesA: 300, votesB: 350, isThread: false, expireDays: 3, remainingPercent: 50, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて' },
+  { id: 310, type: 'image', sponsor: 'インテリア工房', isCorporate: true, creatorAvatar: '🪑', creatorAvatarImage: null, text: 'リビングの照明、どっちが好み？', imgA: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=200&q=80', imgB: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=200&q=80', votesA: 500, votesB: 600, isThread: false, expireDays: 3, remainingPercent: 60, isExpired: false, targetAge: 'すべて', targetHobby: 'ライフスタイル' },
+  { id: 311, type: 'text', sponsor: 'Netflix', isCorporate: true, creatorAvatar: '🎬', creatorAvatarImage: null, text: '休日のイッキ見、どっち？', options: ['映画', '海外ドラマ'], votesA: 2000, votesB: 3000, isThread: false, expireDays: 3, remainingPercent: 85, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて' },
+  { id: 312, type: 'thread', sponsor: 'ユーザーB', isCorporate: false, creatorAvatar: '🎮', creatorAvatarImage: null, isThread: true, expireDays: 3, remainingPercent: 20, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて', steps: [ { text: 'Q1: FPSとTPSどっちが好き？', options: ['FPS', 'TPS'] }, { text: 'Q2: プレイするプラットフォームは？', options: ['PC', 'コンソール'] } ], votesList: [ { votesA: 120, votesB: 80 }, { votesA: 150, votesB: 50 } ] }
+];
+const dummyTemplates = [
+  { sponsor: 'LAWSON', avatar: '🏪', type: 'text', text: 'コンビニでよく買うのは？', optA: 'おにぎり', optB: 'サンドイッチ' },
+  { sponsor: 'Apple', avatar: '🍎', type: 'text', text: 'スマホのロック解除は？', optA: '顔認証', optB: '指紋認証' },
+  { sponsor: 'ユーザーC', avatar: '🐱', type: 'text', text: '朝ごはんは？', optA: 'パン', optB: 'ご飯' },
+  { sponsor: 'JAL', avatar: '✈️', type: 'text', text: '次の旅行先は？', optA: '国内温泉', optB: '海外リゾート' },
+  { sponsor: 'フィットネス24', avatar: '🏃', type: 'text', text: '運動するなら？', optA: '筋トレ', optB: '有酸素' },
+  { sponsor: '美容クリニック', avatar: '✨', type: 'text', text: 'スキンケアで重視するのは？', optA: '保湿', optB: '美白' },
+  { sponsor: 'ユーザーD', avatar: '🎸', type: 'thread', text: '音楽の趣味について', steps: [{q:'よく聴くのは？', a:'邦楽', b:'洋楽'}, {q:'聴く媒体は？', a:'ストリーミング', b:'CD/レコード'}] }
+];
+for(let i = 0; i < 18; i++) {
+  let template = dummyTemplates[i % dummyTemplates.length];
+  if(template.type === 'thread') {
+    initialQuestions.push({ id: 313 + i, type: 'thread', sponsor: template.sponsor, isCorporate: false, creatorAvatar: template.avatar, creatorAvatarImage: null, isThread: true, expireDays: 3, remainingPercent: Math.floor(Math.random()*80)+20, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて', steps: template.steps.map(s => ({text: `Q: ${s.q}`, options: [s.a, s.b]})), votesList: template.steps.map(() => ({votesA: Math.floor(Math.random()*1000), votesB: Math.floor(Math.random()*1000)})) });
+  } else {
+    initialQuestions.push({ id: 313 + i, type: 'text', sponsor: template.sponsor, isCorporate: false, creatorAvatar: template.avatar, creatorAvatarImage: null, text: template.text + ` (No.${i+1})`, options: [template.optA, template.optB], votesA: Math.floor(Math.random()*1000), votesB: Math.floor(Math.random()*1000), isThread: false, expireDays: 3, remainingPercent: Math.floor(Math.random()*80)+20, isExpired: false, targetAge: 'すべて', targetHobby: 'すべて' });
+  }
+}
+
+const publicQuestions = [
+  { id: 401, sponsor: 'ガジェット研究会', creatorAvatar: '🤖', text: 'スマホの最新機種、何を一番重視して選ぶ？', options: ['カメラ性能・動画撮影', 'バッテリー持ちと軽さ'], votesA: 1350, votesB: 740, scope: 'both', isThread: false, targetAge: '10代のみ', targetHobby: 'ガジェット' },
+  { id: 402, sponsor: '映画大好き倶楽部', creatorAvatar: '🎬', text: '映画館で映画をみる場合、最適な座席ポジションは？', options: ['後列のど真ん中席', '一番後ろの端っこペアシート'], votesA: 520, votesB: 980, scope: 'percent', isThread: false, targetAge: 'すべて', targetHobby: 'エンタメ' }
+];
+
+let kasegiEarned = 32400; let kasegiSpent = 28360; let currentPoints = kasegiEarned - kasegiSpent;
+let mockData = [...initialQuestions]; const historyData = []; const myPostedQuestions = [];
+let activeFocusThread = null; let activeFocusStepIndex = 0;
+let activePostType = 'single'; let activePrivacy = 'private'; let threadQuestions = [{ text: '', optA: 'A案', optB: 'B案' }];
+let historyFilter = 'all';
+
+let popupTimers = [];
+function clearPopupTimers() { popupTimers.forEach(id => clearTimeout(id)); popupTimers = []; }
+
+window.onload = function() {
+  updateDisplays(); renderAvatarSelector(); renderHobbyCheckboxes(); initProfileFormFields(); 
+  renderTimeline(); renderHotList(); renderMyPostedList(); renderHistory(); initThreadFields(); runSimulateObservation();
+
+  // スクロール監視：トップバーが隠れたらスティッキーバッジを表示
+  const topbar = document.querySelector('.topbar');
+  const stickyBadge = document.getElementById('sticky-manei-badge');
+  const observer = new IntersectionObserver((entries) => {
+    const isTopbarVisible = entries[0].isIntersecting;
+    if (stickyBadge) stickyBadge.classList.toggle('visible', !isTopbarVisible);
+  }, { threshold: 0 });
+  if (topbar) observer.observe(topbar);
+};
+
+function initProfileFormFields() {
+  document.getElementById('profile-username-input').value = userProfile.name;
+  document.getElementById('profile-age-select').value = userProfile.age;
+  document.getElementById('profile-state-input').value = userProfile.state;
+  document.getElementById('profile-city-input').value = userProfile.city;
+  document.getElementById('post-sponsor').value = userProfile.name;
+  selectAvatarEmoji(userProfile.avatar);
+  hobbyOptions.forEach(hobby => {
+    const chk = document.getElementById(`hobby-chk-${hobby}`);
+    if (chk) { const isSelected = userProfile.hobbies.includes(hobby); chk.checked = isSelected; chk.parentElement.classList.toggle('checked', isSelected); }
+  });
+  updateHobbyCountLabel();
+}
+
+function renderAvatarSelector() {
+  const container = document.getElementById('profile-avatar-grid');
+  container.innerHTML = avatarPool.map(emoji => `<div class="avatar-item" id="avatar-${emoji}" onclick="selectAvatarEmoji('${emoji}')">${emoji}</div>`).join('');
+}
+function selectAvatarEmoji(emoji) {
+  userProfile.avatar = emoji;
+  document.querySelectorAll('.avatar-item').forEach(el => el.classList.remove('selected'));
+  const activeEl = document.getElementById(`avatar-${emoji}`);
+  if (activeEl) activeEl.classList.add('selected');
+  updateTopbarAvatarDisplay();
+}
+function handleImageUpload(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    userProfile.avatarImage = e.target.result; updateTopbarAvatarDisplay();
+    document.getElementById('profile-image-clear-btn').style.display = 'inline-block';
+    document.getElementById('profile-image-preview-desc').innerHTML = `🍏 カスタムアバター画像をアップロードしました`;
+    renderTimeline();
+  }; reader.readAsDataURL(file);
+}
+function clearProfileImage() {
+  userProfile.avatarImage = null; document.getElementById('profile-image-upload').value = '';
+  document.getElementById('profile-image-clear-btn').style.display = 'none';
+  document.getElementById('profile-image-preview-desc').innerHTML = '※ アバター画像は削除されました。';
+  updateTopbarAvatarDisplay(); renderTimeline();
+}
+function updateTopbarAvatarDisplay() {
+  const display = document.getElementById('topbar-avatar-display'); if (!display) return;
+  display.innerHTML = userProfile.avatarImage ? `<img src="${userProfile.avatarImage}" alt="avatar" />` : userProfile.avatar || "👤";
+}
+function getAvatarHTML(avatar, avatarImage) { return avatarImage ? `<img src="${avatarImage}" alt="avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />` : (avatar || "👤"); }
+
+function renderHobbyCheckboxes() {
+  document.getElementById('profile-hobbies-container').innerHTML = hobbyOptions.map(hobby => `
+    <label class="hobby-check-label" id="hobby-lbl-${hobby}"><input type="checkbox" id="hobby-chk-${hobby}" value="${hobby}" onchange="toggleHobbyCheckbox('${hobby}')"><span>${hobby}</span></label>
+  `).join('');
+}
+function toggleHobbyCheckbox(hobby) {
+  const chk = document.getElementById(`hobby-chk-${hobby}`); const lbl = document.getElementById(`hobby-lbl-${hobby}`);
+  const checkedBoxes = Array.from(document.querySelectorAll('#profile-hobbies-container input[type="checkbox"]:checked'));
+  if (checkedBoxes.length > 5) { chk.checked = false; lbl.classList.remove('checked'); alertSimulateModal("制限エラー", "選択できる興味・属性ジャンルは最大5つまでです。"); return; }
+  lbl.classList.toggle('checked', chk.checked);
+  userProfile.hobbies = checkedBoxes.map(b => b.value); updateHobbyCountLabel(); renderTimeline();
+}
+function updateHobbyCountLabel() { const label = document.getElementById('hobby-count-lbl'); if (label) label.textContent = `選択中: ${userProfile.hobbies.length} / 5 種`; }
+
+function updateProfileName(val) { userProfile.name = val.trim() || "マイアカウント"; document.getElementById('post-sponsor').value = userProfile.name; renderTimeline(); }
+function updateProfileAge(val) { userProfile.age = val; renderTimeline(); }
+function updateProfileState(val) { userProfile.state = val.trim(); }
+function updateProfileCity(val) { userProfile.city = val.trim(); }
+
+function updateMarketPriceSingle(val) { marketPriceSingle = parseInt(val); document.getElementById('sim-market-price-lbl').textContent = `${marketPriceSingle.toLocaleString()} maNei`; updatePostCostIndicator(); runSimulateObservation(); }
+function updateDisplays() {
+  currentPoints = kasegiEarned - kasegiSpent; const yen = (currentPoints * 0.01).toFixed(2);
+  document.getElementById('total-points').textContent = currentPoints.toLocaleString(); document.getElementById('total-yen').innerHTML = `≒ &yen;${yen}`;
+  document.getElementById('kasegi-total-earned').textContent = `+${kasegiEarned.toLocaleString()}maNei`; document.getElementById('kasegi-total-spent').textContent = `-${kasegiSpent.toLocaleString()}maNei`;
+  document.getElementById('kasegi-balance').textContent = `${currentPoints.toLocaleString()} maNei`;
+  let efficiency = kasegiEarned > 0 ? Math.round((currentPoints / kasegiEarned) * 100) : 100; if (efficiency < 0) efficiency = 0;
+  document.getElementById('kasegi-efficiency').textContent = `${efficiency}%`; document.getElementById('kasegi-bar-fill').style.width = `${efficiency}%`;
+  if(document.getElementById('profile-points')) document.getElementById('profile-points').textContent = currentPoints.toLocaleString();
+  // スティッキーバッジ更新
+  const sv = document.getElementById('sticky-manei-val');
+  if (sv) sv.textContent = `${currentPoints.toLocaleString()} maNei`;
+}
+
+function executeCharge(amount) { kasegiEarned += amount; updateDisplays(); alertSimulateModal("チャージ完了", `チャージ手続きに成功しました。<br><b style="color:var(--green)">+${amount.toLocaleString()} maNei</b> があなたのアカウントに入金されました！⚡`); }
+function executeChargeWithPay(methodName) { kasegiEarned += 5000; updateDisplays(); alertSimulateModal("決済完了", `${methodName} 決済システムを起動し、チャージを実行しました。<br><b style="color:var(--green)">+5,000 maNei (¥50)</b> をチャージしました。`); }
+function toggleTheme() { document.body.classList.toggle('dark-theme'); }
+function setPostType(type) {
+  activePostType = type; document.getElementById('type-single-btn').classList.toggle('active', type === 'single'); document.getElementById('type-thread-btn').classList.toggle('active', type === 'thread');
+  document.getElementById('single-question-form').style.display = type === 'single' ? 'block' : 'none'; document.getElementById('thread-question-form').style.display = type === 'thread' ? 'block' : 'none';
+  updatePostCostIndicator();
+}
+function updatePostCostIndicator() { document.getElementById('post-cost-indicator').textContent = `${(activePostType === 'single' ? marketPriceSingle : threadQuestions.length * 5000).toLocaleString()} maNei`; }
+
+function initThreadFields() {
+  const container = document.getElementById('thread-questions-container'); if (!container) return;
+  container.innerHTML = ''; threadQuestions.forEach((q, i) => container.appendChild(createThreadQuestionElement(i, q)));
+  if(document.getElementById('thread-count')) document.getElementById('thread-count').textContent = threadQuestions.length;
+  updatePostCostIndicator();
+}
+function createThreadQuestionElement(index, qData) {
+  const div = document.createElement('div'); div.className = 'thread-question-item';
+  div.innerHTML = `
+    <span style="font-size:11px; font-weight:900; color:var(--green)">スレッド質問 ${index + 1} ${index > 0 ? '(追加 +5,000maNei)' : '(基本 5,000maNei)'}</span>
+    ${index > 0 ? `<button class="thread-q-remove" onclick="removeThreadQuestionField(${index})">×</button>` : ''}
+    <div><input type="text" class="form-input thread-q-text" placeholder="質問文を入力" value="${escapeHTML(qData.text || '')}" oninput="updateThreadData(${index}, 'text', this.value)"></div>
+    <div style="display:flex; gap:8px;">
+      <div style="flex:1"><input type="text" class="form-input thread-opt-a" placeholder="Aの選択肢" value="${escapeHTML(qData.optA || 'A案')}" oninput="updateThreadData(${index}, 'optA', this.value)"></div>
+      <div style="flex:1"><input type="text" class="form-input thread-opt-b" placeholder="Bの選択肢" value="${escapeHTML(qData.optB || 'B案')}" oninput="updateThreadData(${index}, 'optB', this.value)"></div>
+    </div>`;
+  return div;
+}
+function removeThreadQuestionField(index) { threadQuestions.splice(index, 1); initThreadFields(); }
+function updateThreadData(index, field, value) { if (threadQuestions[index]) threadQuestions[index][field] = value; }
+function setPrivacy(privacy) { activePrivacy = privacy; document.getElementById('privacy-private-btn').classList.toggle('selected', privacy === 'private'); document.getElementById('privacy-public-btn').classList.toggle('selected', privacy === 'public'); }
+function simulateThreeDaysPass() { mockData.forEach(q => { q.remainingPercent = 0; q.isExpired = true; }); renderTimeline(); alertSimulateModal("回答期限切れ(3日経過)シミュレーション", "3日の期限を過ぎたアンケートは、画面から消去（他のユーザーへ移譲）されました。"); }
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline-cards-container'); tl.innerHTML = '';
+  const currentReward = totalAnswerClicks >= 30 ? 1 : 100;
+
+  const matchedQuestions = mockData.filter(q => {
+    if (q.isUserCreated && q.sponsor === userProfile.name) return false;
+    if (q.isExpired) return false;
+    const targetAge = q.targetAge || 'すべて'; const targetHobby = q.targetHobby || 'すべて';
+    const isAgeMatch = (targetAge === 'すべて' || targetAge === userProfile.age);
+    const isHobbyMatch = (targetHobby === 'すべて' || userProfile.hobbies.includes(targetHobby));
+    return isAgeMatch && isHobbyMatch;
+  });
+
+  // maNei低下警告バナー表示制御
+  const warningBanner = document.getElementById('manei-warning-banner');
+  if (warningBanner) warningBanner.classList.toggle('visible', totalAnswerClicks >= 30);
+
+  // アンケート総数カウンター更新
+  const totalQ = matchedQuestions.reduce((sum, q) => sum + (q.isThread ? q.steps.length : 1), 0);
+  const remainEl = document.getElementById('remaining-q-count');
+  const bonusEl = document.getElementById('bonus-progress-text');
+  if (remainEl) remainEl.textContent = totalQ;
+  if (bonusEl) {
+    const needed = Math.max(0, 30 - totalAnswerClicks);
+    bonusEl.textContent = needed > 0 ? `あと${needed}問` : '🎉 ボーナス達成！';
+    bonusEl.style.color = needed <= 5 ? 'var(--red)' : 'var(--green2)';
+  }
+
+  if (matchedQuestions.length === 0) {
+    // 問題が空 → bg-radarを停止
+    const bgRadar = document.getElementById('bg-radar');
+    if (bgRadar) bgRadar.classList.add('paused');
+    tl.innerHTML = `
+      <div class="matching-waiting-box">
+        <div class="matching-waiting-ring">📭<div class="matching-core-wave"></div></div>
+        <div class="matching-waiting-text">条件に合うアンケートを待機中...</div>
+      </div>`;
+    return;
+  }
+
+  // 問題あり → bg-radarを再開
+  const bgRadarActive = document.getElementById('bg-radar');
+  if (bgRadarActive) bgRadarActive.classList.remove('paused');
+
+  matchedQuestions.forEach(q => {
+    const targetHTML = `<span class="badge-target">#${q.targetHobby || 'すべて'}対象</span>`;
+    const barClass = q.remainingPercent <= 25 ? 'deadline-progress-fill warning' : 'deadline-progress-fill';
+    const remainingDays = Math.ceil((q.remainingPercent / 100) * q.expireDays);
+    const deadlineColor = q.remainingPercent <= 25 ? 'var(--red)' : 'var(--text2)';
+    const deadlineDayText = q.remainingPercent <= 25 ? `⚠️ あと${remainingDays}日` : `あと${remainingDays}日`;
+    const deadlineHTML = `<div class="deadline-box"><span style="color:${deadlineColor}; font-weight:800;">${deadlineDayText}</span><div class="deadline-progress-container"><div class="${barClass}" style="width:${q.remainingPercent}%"></div></div><span style="font-size:10px; color:var(--text3); margin-left:8px;">${q.expireDays}日間</span></div>`;
+    const avatarContent = getAvatarHTML(q.creatorAvatar, q.creatorAvatarImage);
+    const creatorName = q.sponsor || "マイアカウント";
+    const creatorHTML = `<div class="creator-profile-badge"><div class="creator-avatar-circle">${avatarContent}</div><span>${creatorName}</span></div>`;
+
+    let cardDiv = document.createElement('div');
+    cardDiv.className = 'q-card';
+    cardDiv.id = `qcard-${q.id}`;
+
+    if (q.isThread) {
+      const stepDots = q.steps.map((_, i) => `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${i===0?'var(--green)':'var(--border)'}; margin-right:3px;"></span>`).join('');
+      cardDiv.innerHTML = `
+        <div class="card-hdr">
+          <div class="card-hdr-row1">${creatorHTML}<div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward * q.steps.length}maNei</div></div>
+          <div class="card-hdr-row2">
+            ${targetHTML}
+            <span style="background:linear-gradient(135deg,#8b5cf6,#6366f1); color:#fff; font-size:10px; font-weight:900; padding:3px 10px; border-radius:12px;">📋 ${q.steps.length}問セット</span>
+          </div>
+        </div>
+        <div class="card-txt">${q.steps[0].text}</div>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px; font-size:11px; color:var(--text3); font-weight:700;">
+          <span>進行:</span>${stepDots}<span style="color:var(--text2);">全${q.steps.length}問を連続回答</span>
+        </div>
+        ${deadlineHTML}
+        <button class="submit-post-btn" style="background:linear-gradient(135deg, #8b5cf6, #6366f1); margin-top:4px;" onclick="startThreadFocus(${q.id})">
+          📋 スレッドを回答する（${q.steps.length}問）
+        </button>
+      `;
+    } else {
+      if (q.type === 'text') {
+        cardDiv.innerHTML = `
+          <div class="card-hdr">
+            <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward}maNei</div><span style="background:var(--green-pale); color:var(--green2); font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; border:1px solid var(--border);">📝 テキスト</span></div></div>
+            <div class="card-hdr-row2">${targetHTML}</div>
+          </div>
+          <div class="card-txt">${q.text}</div>
+          ${deadlineHTML}
+          <div class="btn-grid">
+            <button class="choice-btn" onclick="submitChoice(${q.id}, 'A. ${q.options[0]}', 'A')">A. ${q.options[0]}</button>
+            <button class="choice-btn" onclick="submitChoice(${q.id}, 'B. ${q.options[1]}', 'B')">B. ${q.options[1]}</button>
+          </div>
+        `;
+      } else {
+        cardDiv.innerHTML = `
+          <div class="card-hdr">
+            <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward}maNei</div><span style="background:#fff8e6; color:#b07a00; font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; border:1px solid #ffe09a;">🖼️ 画像</span></div></div>
+            <div class="card-hdr-row2">${targetHTML}</div>
+          </div>
+          <div class="card-txt">${q.text}</div>
+          ${deadlineHTML}
+          <div class="img-grid">
+            <div class="img-box" onclick="submitChoice(${q.id}, 'A案 (左)', 'A')"><img src="${q.imgA}" alt="A案" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23ccc\'/><text x=\'50%\' y=\'50%\' dom-anchor=\'middle\' text-anchor=\'middle\'>Image A</text></svg>'"><div class="img-badge">A案</div></div>
+            <div class="img-box" onclick="submitChoice(${q.id}, 'B案 (右)', 'B')"><img src="${q.imgB}" alt="B案" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100\' height=\'100\' fill=\'%23ccc\'/><text x=\'50%\' y=\'50%\' dom-anchor=\'middle\' text-anchor=\'middle\'>Image B</text></svg>'"><div class="img-badge">B案</div></div>
+          </div>
+        `;
+      }
+    }
+    tl.appendChild(cardDiv);
+  });
+}
+
+let skipCancelConfirm = false;
+
+function cancelThreadFocus() {
+  if (!activeFocusThread) { document.getElementById('thread-focus-modal').classList.remove('active'); return; }
+  const stepsAnswered = activeFocusStepIndex;
+  const rewardPerStep = totalAnswerClicks > 30 ? 1 : 100;
+  const totalLost = stepsAnswered * rewardPerStep;
+
+  function doCancel() {
+    for (let i = 0; i < stepsAnswered; i++) {
+      historyData.shift();
+      kasegiEarned -= rewardPerStep;
+      totalAnswerClicks--;
+    }
+    updateDisplays();
+    document.getElementById('thread-focus-modal').classList.remove('active');
+    activeFocusThread = null; activeFocusStepIndex = 0;
+    if (totalLost > 0) showCancelManeiFloat(totalLost);
+    renderTimeline();
+  }
+
+  if (skipCancelConfirm || stepsAnswered === 0) { doCancel(); return; }
+
+  // ダイアログ
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; z-index:800; padding:20px;';
+  wrap.innerHTML = `
+    <div style="background:var(--card); color:var(--text); padding:24px; border-radius:20px; width:100%; max-width:300px; border:1.5px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,0.4);">
+      <div style="font-size:24px; text-align:center; margin-bottom:8px;">⚠️</div>
+      <div style="font-size:14px; font-weight:900; text-align:center; margin-bottom:8px;">スレッドを中断しますか？</div>
+      <div style="font-size:12px; color:var(--text2); text-align:center; line-height:1.6; margin-bottom:16px;">
+        途中回答はすべて無効になります。<br>
+        ${totalLost > 0 ? `<b style="color:var(--red)">－${totalLost.toLocaleString()} maNei</b> が返却されます。` : ''}
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text3); margin-bottom:16px; cursor:pointer;">
+        <input type="checkbox" id="skip-confirm-chk"> 次回から確認しない
+      </label>
+      <div style="display:flex; gap:8px;">
+        <button id="cancel-dialog-no" style="flex:1; padding:10px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-weight:800; cursor:pointer; font-size:13px;">続ける</button>
+        <button id="cancel-dialog-yes" style="flex:1; padding:10px; border:none; border-radius:10px; background:var(--red); color:#fff; font-weight:800; cursor:pointer; font-size:13px;">やめる</button>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+  document.getElementById('cancel-dialog-no').onclick = () => document.body.removeChild(wrap);
+  document.getElementById('cancel-dialog-yes').onclick = () => {
+    if (document.getElementById('skip-confirm-chk').checked) skipCancelConfirm = true;
+    document.body.removeChild(wrap);
+    doCancel();
+  };
+}
+
+function showCancelManeiFloat(amount) {
+  const el = document.getElementById('cancel-manei-float');
+  if (!el) return;
+  el.textContent = `－${amount.toLocaleString()} maNei`;
+  el.style.opacity = '1';
+  el.style.transition = 'none';
+  el.style.transform = 'translate(-50%, -50%)';
+  void el.offsetWidth;
+  el.style.transition = 'opacity 1.8s ease, transform 1.8s ease';
+  el.style.transform = 'translate(-50%, -130%)';
+  el.style.opacity = '0';
+  setTimeout(() => { el.style.transition = 'none'; el.style.transform = 'translate(-50%,-50%)'; el.style.opacity = '0'; }, 1900);
+}
+
+function startThreadFocus(id) {
+  const qObj = mockData.find(item => item.id === id); if (!qObj || !qObj.isThread || qObj.isExpired) return;
+  activeFocusThread = qObj; activeFocusStepIndex = 0; updateThreadFocusView(); document.getElementById('thread-focus-modal').classList.add('active');
+}
+function updateThreadFocusView() {
+  if (!activeFocusThread) return;
+  const stepInfo = activeFocusThread.steps[activeFocusStepIndex]; const total = activeFocusThread.steps.length;
+  document.getElementById('thread-focus-sponsor').textContent = activeFocusThread.sponsor;
+  document.getElementById('thread-focus-progress').textContent = `Step: ${activeFocusStepIndex + 1} / ${total}`;
+  document.getElementById('thread-focus-text').textContent = stepInfo.text;
+  document.getElementById('thread-focus-btn-a').textContent = `A. ${stepInfo.options[0]}`;
+  document.getElementById('thread-focus-btn-b').textContent = `B. ${stepInfo.options[1]}`;
+}
+function submitThreadFocusChoice(choiceType) {
+  if (!activeFocusThread) return;
+  const currentStep = activeFocusThread.steps[activeFocusStepIndex];
+  const userChoiceStr = choiceType === 'A' ? `A. ${currentStep.options[0]}` : `B. ${currentStep.options[1]}`;
+  const rewardMoney = totalAnswerClicks >= 30 ? 1 : 100;
+  const isLastStep = (activeFocusStepIndex === activeFocusThread.steps.length - 1);
+  saveStepToHistory(activeFocusThread, activeFocusStepIndex, userChoiceStr, rewardMoney);
+  kasegiEarned += rewardMoney; totalAnswerClicks++;
+  let step = totalAnswerClicks % 3 === 0 ? 3 : totalAnswerClicks % 3; let cycle = Math.ceil(totalAnswerClicks / 3);
+  let comboBonus = (cycle === 10 && step === 3) ? (totalAnswerClicks > 30 ? 10 : 1000) : 0; kasegiEarned += comboBonus;
+  let threadCompleteBonus = isLastStep ? (totalAnswerClicks > 30 ? 3 : 300) : 0; if (isLastStep) kasegiEarned += threadCompleteBonus;
+  updateDisplays(); triggerPopups(step, cycle, rewardMoney, comboBonus, isLastStep, threadCompleteBonus);
+  if (!isLastStep) {
+    const cardEl = document.getElementById('thread-focus-card');
+    // 1. カードを揺らす
+    cardEl.classList.add('card-shaking');
+    // 2. 揺れ中に内容をフェードアウト
+    const innerEls = cardEl.querySelectorAll('.card-txt, .btn-grid, .deadline-box, #thread-focus-progress');
+    innerEls.forEach(el => { el.style.transition = 'opacity 0.2s'; el.style.opacity = '0'; });
+    // 3. 1秒後に次の設問をふわっと表示
+    setTimeout(() => {
+      activeFocusStepIndex++;
+      updateThreadFocusView();
+      cardEl.classList.remove('card-shaking');
+      // 内容だけふわっと浮き上がり
+      const innerEls2 = cardEl.querySelectorAll('.card-txt, .btn-grid, .deadline-box, #thread-focus-progress');
+      innerEls2.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(14px)';
+        el.style.transition = 'opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1)';
+        void el.offsetWidth;
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
+      setTimeout(() => {
+        innerEls2.forEach(el => { el.style.transition = ''; el.style.transform = ''; el.style.opacity = ''; });
+      }, 550);
+    }, 175);
+  } else {
+    document.getElementById('thread-focus-modal').classList.remove('active'); const tid = activeFocusThread.id;
+    setTimeout(() => { removeQuestionFromTimeline(tid); activeFocusThread = null; }, 300);
+  }
+}
+function saveStepToHistory(qObj, stepIndex, choiceStr, reward) {
+  historyData.unshift({ id: qObj.id + `_step_${stepIndex}`, sponsor: qObj.sponsor, text: `[スレッド第${stepIndex + 1}問] ${qObj.steps[stepIndex].text}`, userChoice: choiceStr, reward: reward, isFavorited: false, daysElapsed: 0, answeredAt: new Date().toLocaleString('ja-JP') });
+}
+function submitChoice(id, userChoiceStr, choiceType) {
+  const qObj = mockData.find(item => item.id === id); if (!qObj || qObj.isExpired) return;
+  if (choiceType === 'A') qObj.votesA++; else qObj.votesB++;
+  const selfPost = myPostedQuestions.find(p => p.id === id); if (selfPost) { if (choiceType === 'A') selfPost.votesA++; else selfPost.votesB++; }
+  const card = document.getElementById(`qcard-${id}`); if (card) card.classList.add('collapsed');
+  const rewardMoney = totalAnswerClicks >= 30 ? 1 : 100;
+  historyData.unshift({ id: qObj.id, sponsor: qObj.sponsor, text: qObj.text, userChoice: userChoiceStr, reward: rewardMoney, isFavorited: false, daysElapsed: 0, answeredAt: new Date().toLocaleString('ja-JP') });
+  setTimeout(() => { removeQuestionFromTimeline(id); }, 400);
+  totalAnswerClicks++; let step = totalAnswerClicks % 3 === 0 ? 3 : totalAnswerClicks % 3; let cycle = Math.ceil(totalAnswerClicks / 3);
+  let bonus = (cycle === 10 && step === 3) ? (totalAnswerClicks > 30 ? 10 : 1000) : 0; kasegiEarned += (rewardMoney + bonus); updateDisplays();
+  triggerPopups(step, cycle, rewardMoney, bonus, false, 0);
+}
+function removeQuestionFromTimeline(id) {
+  const targetIndex = mockData.findIndex(item => item.id === id); if (targetIndex !== -1) mockData.splice(targetIndex, 1);
+  renderTimeline();
+}
+
+function triggerPopups(step, cycle, base, bonus, isLastStep = false, threadCompleteBonus = 0) {
+  clearPopupTimers();
+  const rPopupEl = document.getElementById('rhythm-text'); const rWordEl = document.getElementById('rhythm-word'); const rPtsEl = document.getElementById('rhythm-pts');
+  const comboEl = document.getElementById('combo-float-text'); const bgRadar = document.getElementById('bg-radar'); const bodyEl = document.body;
+  rPopupEl.classList.remove('pop'); comboEl.classList.remove('pop'); comboEl.classList.remove('rainbow-text'); if (bgRadar) bgRadar.classList.remove('pulse-active'); 
+  bodyEl.classList.remove('shake-light', 'shake-mid', 'shake-heavy');
+  void rPopupEl.offsetWidth; void comboEl.offsetWidth; void bodyEl.offsetWidth; if (bgRadar) void bgRadar.offsetWidth;
+  if (bgRadar) bgRadar.classList.add('pulse-active');
+
+  // スレッド回答中はshakeしない（オーバーレイとbodyのずれを防ぐ）
+  const isThreadOpen = document.getElementById('thread-focus-modal')?.classList.contains('active');
+  if (!isThreadOpen) {
+    if (step === 3 && cycle === 10) { bodyEl.classList.add('shake-heavy'); }
+    else if (step === 3) { bodyEl.classList.add('shake-mid'); }
+    else { bodyEl.classList.add('shake-light'); }
+  }
+  
+  comboEl.style.setProperty('--combo-size', Math.min(42 + (cycle * 4), 80) + "px");
+  let ptsText = `+${(base + bonus + threadCompleteBonus).toLocaleString()}maNei`;
+  if (isLastStep && threadCompleteBonus > 0) ptsText += `<div class="rainbow-text" style="font-size:30px; margin-top:10px; font-weight:900; letter-spacing:1px; line-height:1.2; text-align:center; width:100%; word-break:break-word;">+ THREAD COMPLETE BONUS!</div>`;
+  const wordLabel = step === 3 ? "tan!" : step === 2 ? "ta²!" : "ta!";
+  rWordEl.innerHTML = wordLabel;
+  rPtsEl.innerHTML = (step === 3 && cycle === 10) ? (isLastStep ? ptsText : `+${base.toLocaleString()}maNei & BONUS +${bonus.toLocaleString()}maNei!`) : ptsText;
+  
+  rPopupEl.classList.add('pop');
+  
+  if (step === 3) {
+    if (cycle === 10) fireworks(true); else fireworks(false);
+    popupTimers.push(setTimeout(() => { 
+      rPopupEl.classList.remove('pop'); 
+      comboEl.innerHTML = (cycle === 10) ? `🔥 10 ta²tan!` : `${cycle} ta²tan!`; 
+      if (cycle === 10) comboEl.classList.add('rainbow-text'); 
+      comboEl.classList.add('pop'); 
+    }, 450 + 500));
+    popupTimers.push(setTimeout(() => { comboEl.classList.remove('pop'); }, 2400 + 500));
+  } else {
+    popupTimers.push(setTimeout(() => { rPopupEl.classList.remove('pop'); }, 500 + 500));
+  }
+  
+  const badge = document.getElementById('combo-badge');
+  const nextLabel = step === 1 ? "ta²!" : step === 2 ? "tan!" : "ta!";
+  if (badge) badge.innerHTML = `<span class="mini-indicator"><span class="mini-dot-pulse"></span><span>Combo: ${step} / 3 (Cycle: ${cycle}) ⚡</span></span><span>Next: ${nextLabel}</span>`;
+  // スティッキーバッジのコンボ更新
+  const sc = document.getElementById('sticky-combo-val');
+  if (sc) sc.textContent = `${cycle}ta²tan! + ${step}/3 → Next: ${nextLabel}`;
+}
+
+function fireworks(isRainbow) {
+  const canvas = document.getElementById('firework-canvas'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; const ctx = canvas.getContext('2d'); const particles = [];
+  const colors = isRainbow ? ['#ff4d6d', '#ffb800', '#00e88a', '#3b8fff', '#8b5cf6'] : ['#00e88a', '#00c873', '#ffffff']; const origin = { x: canvas.width * 0.5, y: canvas.height * 0.45 }; 
+  const particleCount = isRainbow ? 300 : 150; 
+  for (let i = 0; i < particleCount; i++) {
+    const angle = (Math.PI * 2 / particleCount) * i + Math.random() * 0.25; const speed = isRainbow ? (6 + Math.random() * 20) : (4 + Math.random() * 12);
+    particles.push({ x: origin.x, y: origin.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, color: colors[Math.floor(Math.random() * colors.length)], size: isRainbow ? (2.5 + Math.random() * 4) : (2 + Math.random() * 3), decay: isRainbow ? 0.010 : 0.014, gravity: 0.08 });
+  }
+  function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach((p) => { ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.globalAlpha = p.alpha; ctx.fill(); p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.alpha -= p.decay; }); if (particles.filter(p => p.alpha > 0).length > 0) requestAnimationFrame(animate); } animate();
+}
+
+function submitNewQuestion() {
+  if (!document.getElementById('cost-consent-chk').checked) { alertSimulateModal("ポリシー同意エラー", "配信コストポリシーに同意する必要があります。"); return; }
+  let cost = 0; const sponsor = document.getElementById('post-sponsor').value.trim() || userProfile.name; const privacy = activePrivacy; const scope = "both"; const expireDays = parseInt(document.getElementById('post-expire-days').value); const targetAge = document.getElementById('post-target-age').value; const targetHobby = document.getElementById('post-target-hobby').value;
+  let newId = Date.now();
+  let newObj = { id: newId, sponsor: sponsor, isCorporate: false, creatorAvatar: userProfile.avatar, creatorAvatarImage: userProfile.avatarImage, privacy: privacy, scope: scope, votesA: 0, votesB: 0, expireDays: expireDays, remainingPercent: 100, isExpired: false, targetAge: targetAge, targetHobby: targetHobby, isUserCreated: true, isMyPost: true };
+  if (activePostType === 'single') {
+    cost = marketPriceSingle; const qText = document.getElementById('post-q-text').value.trim(); if (!qText) { alertSimulateModal("入力エラー", "質問テキストを入力してください。"); return; }
+    newObj.isThread = false; newObj.type = 'text'; newObj.text = qText; newObj.options = [document.getElementById('post-opt-a').value.trim() || 'A案', document.getElementById('post-opt-b').value.trim() || 'B案'];
+  } else {
+    const validQuestions = threadQuestions.filter(q => q.text.trim() !== ""); if (validQuestions.length === 0) { alertSimulateModal("入力エラー", "スレッド有効質問を入力してください。"); return; }
+    cost = validQuestions.length * 5000; newObj.isThread = true; newObj.type = 'thread'; newObj.steps = validQuestions.map(q => ({ text: q.text, options: [q.optA || 'A案', q.optB || 'B案'] })); newObj.currentStepIndex = 0; newObj.votesList = validQuestions.map(() => ({ votesA: 0, votesB: 0 }));
+  }
+  if (currentPoints < cost) { alertSimulateModal("maNei不足", `アンケート配布には ${cost.toLocaleString()}maNei 必要ですが、現在 ${currentPoints.toLocaleString()}maNei を保有しています。`); return; }
+  kasegiSpent += cost; updateDisplays(); mockData.unshift(newObj); myPostedQuestions.unshift(newObj);
+  if (privacy === 'public') publicQuestions.unshift({ id: newId + '_comm', sponsor: sponsor, creatorAvatar: userProfile.avatar, creatorAvatarImage: userProfile.avatarImage, options: newObj.isThread ? newObj.steps[0].options : newObj.options, text: newObj.isThread ? `[スレッド開始] ${newObj.steps[0].text}` : newObj.text, votesA: 0, votesB: 0, scope: 'both', isThread: newObj.isThread, targetAge: targetAge, targetHobby: targetHobby });
+  document.getElementById('post-q-text').value = ''; document.getElementById('post-target-age').value = 'すべて'; document.getElementById('post-target-hobby').value = 'すべて'; threadQuestions = [{ text: '', optA: 'A案', optB: 'B案' }]; initThreadFields(); switchTab('timeline'); alertSimulateModal("配布・送信完了！", `${cost.toLocaleString()}maNeiを消費し、ターゲット【年齢:${targetAge} / 趣味:${targetHobby}】向けにマイアバターで配布をスタートしました！`);
+}
+
+function renderHotList() {
+  document.getElementById('hot-list').innerHTML = publicQuestions.map(h => {
+    const totalVotes = h.votesA + h.votesB; const percentA = totalVotes > 0 ? Math.round((h.votesA / totalVotes) * 100) : 50; const percentB = 100 - percentA;
+    return `
+      <div class="q-card">
+        <div class="card-hdr">
+          <div class="card-hdr-row1">
+            <div class="creator-profile-badge"><div class="creator-avatar-circle">${getAvatarHTML(h.creatorAvatar, h.creatorAvatarImage)}</div><span>${h.sponsor}</span></div>
+            <span style="color:var(--yellow); font-weight:800; font-size:10px;">🔥 トレンド集計</span>
+          </div>
+          <div class="card-hdr-row2"><span class="badge-target">#${h.targetHobby || 'すべて'}対象</span></div>
+        </div>
+        <div class="card-txt" style="font-size:14px; margin-bottom: 8px;">${h.text}</div>
+        <div style="font-size:12px; color:var(--text2); margin-bottom: 8px;">A. <b style="color:var(--green)">${h.options ? h.options[0] : 'A案'}</b> | B. <b style="color:var(--text3)">${h.options ? h.options[1] : 'B案'}</b></div>
+        <div style="font-size:11px; color:var(--text3); display:flex; justify-content:space-between; margin-bottom:4px;"><span>A: ${h.votesA}票 (${percentA}%)</span><span>B: ${h.votesB}票 (${percentB}%)</span></div>
+        <div class="result-bar-container"><div class="result-fill-a" style="width: ${percentA}%">${percentA}%</div><div class="result-fill-b">${percentB}%</div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderMyPostedList() {
+  const container = document.getElementById('my-posted-list');
+  if (myPostedQuestions.length === 0) { container.innerHTML = `<div style="text-align:center; color:var(--text3); font-size:12px; padding:20px; border:1.5px dashed var(--border); border-radius:12px;">配布した自作アンケートはまだありません。</div>`; return; }
+  container.innerHTML = myPostedQuestions.map(p => {
+    let statsHTML = ""; const targetHTML = `<span class="badge-target">#${p.targetHobby || 'すべて'}対象</span>`;
+    if (p.isThread) {
+      statsHTML = p.steps.map((step, idx) => {
+        const votes = p.votesList[idx]; const total = votes.votesA + votes.votesB; const pA = total > 0 ? Math.round((votes.votesA / total) * 100) : 50; const pB = 100 - pA;
+        return `<div style="margin-top:8px; padding: 10px; background:var(--bg); border-radius:8px; border:1.5px solid var(--border);"><div style="font-size:11px; font-weight:800; color:var(--green2); margin-bottom:4px;">Q${idx+1}: ${step.text}</div><div style="font-size:10px; color:var(--text3); display:flex; justify-content:space-between; margin-bottom:3px;"><span>A: ${votes.votesA}人 (${pA}%)</span><span>B: ${votes.votesB}人 (${pB}%)</span></div><div class="result-bar-container" style="height:12px;"><div class="result-fill-a" style="width: ${pA}%; font-size:9px;">${pA}%</div><div class="result-fill-b" style="font-size:9px;">${pB}%</div></div></div>`;
+      }).join('');
+    } else {
+      const total = p.votesA + p.votesB; const pA = total > 0 ? Math.round((p.votesA / total) * 100) : 50; const pB = 100 - pA;
+      statsHTML = `<div style="font-size: 11px; color: var(--text3); display:flex; justify-content:space-between; margin-bottom:4px;"><span>A: ${p.votesA}人 (${pA}%)</span><span>B: ${p.votesB}人 (${pB}%)</span></div><div class="result-bar-container"><div class="result-fill-a" style="width: ${pA}%">${pA}%</div><div class="result-fill-b">${pB}%</div></div>`;
+    }
+    const privacyBadge = p.privacy === 'public' ? `<span style="background:#e0f2fe; color:#0369a1; font-size:9px; padding:2px 6px; border-radius:10px;">🌍 公開中</span>` : `<span style="background:#f1f5f9; color:#475569; font-size:9px; padding:2px 6px; border-radius:10px;">🔒 非公開</span>`;
+    return `
+      <div class="q-card" style="border-color: var(--green);">
+        <div class="card-hdr">
+          <div class="card-hdr-row1"><span class="sponsor" style="font-weight:800; font-size:12px;">配布進捗分析</span>${privacyBadge}</div>
+          <div class="card-hdr-row2">${targetHTML}</div>
+        </div>
+        <div class="card-txt" style="font-size:14px; margin-bottom: 8px;">${p.isThread ? `[スレッド全 ${p.steps.length} 問]` : p.text}</div>
+        ${statsHTML}
+      </div>`;
+  }).join('');
+}
+
+function setHistoryFilter(filter) { historyFilter = filter; document.getElementById('hist-filter-all').classList.toggle('active', filter === 'all'); document.getElementById('hist-filter-fav').classList.toggle('active', filter === 'fav'); renderHistory(); }
+function simulateThirtyDaysPass() { historyData.forEach(h => { h.daysElapsed += 30; }); renderHistory(); alertSimulateModal("30日経過シミュレーション", "30日が経過しました。お気に入り保護のない履歴アンケートのみ自動で消滅・クリーニングされました。"); }
+function toggleFav(id) { const target = historyData.find(h => String(h.id) === String(id)); if (target) { target.isFavorited = !target.isFavorited; } renderHistory(); }
+
+function renderHistory() {
+  const container = document.getElementById('view-history');
+  const activeHistory = historyData.filter(h => { if (h.daysElapsed < 30 || h.isFavorited) { return historyFilter === 'fav' ? h.isFavorited : true; } return false; });
+  if (activeHistory.length === 0) { container.innerHTML = `<div style="text-align:center; color:var(--text3); font-size:12px; padding:24px 0;" id="empty-history">履歴はありません。</div>`; return; }
+  container.innerHTML = activeHistory.map(h => {
+    let commentHTML = h.comment ? `<div style="font-size:12px; background:var(--green-pale); padding:10px; border-radius:8px; margin-top:10px; font-weight:500; width:100%;"><b style="color:var(--green2);">📝 コメント:</b><br>${escapeHTML(h.comment)}</div>` : `<div class="comment-section" id="comsect-${h.id}"><button class="comment-trigger" onclick="openCommentBox('${h.id}')">コメントを120文字で残す(任意)</button><button class="fav-btn ${h.isFavorited ? 'active' : ''}" onclick="toggleFav('${h.id}')" title="お気に入り保護">${h.isFavorited ? '🩵' : '🤍'}</button></div>`;
+    const elapsedText = h.daysElapsed >= 30 ? `(お気に入り保護中 - ${h.daysElapsed}日経過)` : `(自動消滅まであと ${30 - h.daysElapsed} 日)`;
+    return `
+      <div class="history-card" style="background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:20px; margin-bottom:10px; box-shadow:var(--shadow-card);">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:800; color:var(--text3); margin-bottom:6px;"><span>${h.sponsor}</span><span style="color:var(--green)">+${h.reward.toLocaleString()}maNei</span></div>
+        <div style="font-size:13px; font-weight:800; margin-bottom:6px;">問: ${h.text}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;"><span style="display:inline-block; background:var(--green-pale); color:var(--green2); font-size:11px; padding:4px 8px; border-radius:6px; font-weight:800;">選択: ${h.userChoice}</span><span style="font-size:10px; color:var(--text3); font-weight:700;">${elapsedText}</span></div>
+        ${commentHTML}
+      </div>`;
+  }).join('');
+}
+
+function openCommentBox(id) {
+  const comsect = document.getElementById(`comsect-${id}`); if (!comsect) return;
+  comsect.innerHTML = `<div class="comment-box"><textarea id="input-${id}" class="comment-input" rows="2" maxlength="120" placeholder="商品や体験へのフィードバックを記入できます(120字)" oninput="updateCharCount('${id}')"></textarea><div class="comment-footer"><span id="count-${id}">0 / 120 文字</span><button class="submit-comment-btn" onclick="submitComment('${id}')">送信</button></div></div>`;
+}
+function updateCharCount(id) { const input = document.getElementById(`input-${id}`); const counter = document.getElementById(`count-${id}`); if (input && counter) counter.innerText = `${input.value.length} / 120 文字`; }
+function submitComment(id) { const input = document.getElementById(`input-${id}`); const val = input ? input.value.trim() : ""; const target = historyData.find(h => String(h.id) === String(id)); if (target) target.comment = val; renderHistory(); }
+
+function runSimulateObservation() {
+  const corpVal = parseInt(document.getElementById('sim-corp-slider').value); const userVal = parseInt(document.getElementById('sim-user-slider').value); const postVal = parseInt(document.getElementById('sim-post-slider').value);
+  document.getElementById('sim-corp-lbl').textContent = `${corpVal}問 (+${(corpVal * 1000).toLocaleString()}maNei)`; document.getElementById('sim-user-lbl').textContent = `${userVal}問 (+${(userVal * 100).toLocaleString()}maNei)`; document.getElementById('sim-post-lbl').textContent = `${postVal}回 (-${(postVal * marketPriceSingle).toLocaleString()}maNei)`;
+  const netWeeklyBalance = ((corpVal * 1000) + (userVal * 100)) * 7 - (postVal * marketPriceSingle);
+  const diag = document.getElementById('sim-diagnostic-text');
+  let diagnostics = `<b>📊 運営試算レポート (非公開メモ):</b><br>週の収支: <b style="color:#38bdf8">+${netWeeklyBalance.toLocaleString()}maNei (≒ ¥${(netWeeklyBalance * 0.01).toFixed(2)}円) / 週</b><br>`;
+  if (netWeeklyBalance >= 35000) diagnostics += `<span style="color:#ff4d6d; font-weight:800;">⚠️ 要収支観察: 週¥350以上貯まるハイペース。企業案件供給と回答権移譲のバランスが鍵です。</span>`;
+  else if (netWeeklyBalance >= 7000) diagnostics += `<span style="color:#00c873; font-weight:800;">✅ 適正収支: 持続可能な設計バランスです。</span>`;
+  else diagnostics += `<span style="color:#e2b714; font-weight:800;">💡 ローペース: 獲得に対して配信頻度が勝っています。ユーザー回答ボリュームを増やすことで最適化されます。</span>`;
+  diag.innerHTML = diagnostics;
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + tabId).classList.add('active'); document.getElementById('nav-' + tabId).classList.add('active');
+  const bgRadar = document.getElementById('bg-radar'); if (bgRadar) bgRadar.style.display = (tabId === 'timeline') ? 'flex' : 'none';
+  if (tabId === 'timeline') renderTimeline(); else if (tabId === 'monitor') { renderMyPostedList(); renderHotList(); } else if (tabId === 'kasegi') { renderHistory(); }
+}
+function alertSimulateWithdraw() {
+  if (currentPoints < 100) { alertSimulateModal("残高不足", "払い出し可能なmaNeiがありません。"); return; }
+  const amount = currentPoints; kasegiSpent += amount; updateDisplays(); alertSimulateModal("払い出し申請完了", `${amount.toLocaleString()}maNei のStripe出金手続きを実行し、KASEGIの「消費累計」に計上しました。`);
+}
+function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+function alertSimulateModal(title, text) {
+  const wrap = document.createElement('div'); wrap.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; z-index:999; padding:20px; backdrop-filter:blur(4px);';
+  const box = document.createElement('div'); box.style.cssText = 'background:var(--card); color:var(--text); padding:24px; border-radius:20px; width:100%; max-width:320px; text-align:center; border:1.5px solid var(--border); box-shadow:0 10px 30px rgba(0,0,0,0.3);';
+  box.innerHTML = `<div style="font-size:28px; margin-bottom:8px;">💳</div><h3 style="font-size:16px; font-weight:800; margin-bottom:8px;">${title}</h3><p style="font-size:13px; color:var(--text2); line-height:1.5; margin-bottom:18px;">${text}</p><button id="modal-close-btn" style="width:100%; background:var(--green); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; cursor:pointer;">閉じる</button>`;
+  wrap.appendChild(box); document.body.appendChild(wrap); document.getElementById('modal-close-btn').onclick = () => document.body.removeChild(wrap);
+}
+</script>
+</body>
+</html>
