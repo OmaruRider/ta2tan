@@ -30,6 +30,50 @@
   --shadow-btn: 0 4px 14px rgba(0,180,100,0.25);
 }
 
+/* パッションピンク テーマ */
+.theme-pink {
+  --green: #ff2d78;
+  --green2: #d4005a;
+  --green3: #ff6aa0;
+  --green-pale: #fff0f5;
+  --green-pale2: #fff5f8;
+  --bg: #fff5f8;
+  --card: #ffffff;
+  --border: #ffc0d6;
+  --text: #2a0010;
+  --text2: #a0004a;
+  --text3: #d4789a;
+  --shadow-card: 0 2px 20px rgba(255,45,120,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-btn: 0 4px 14px rgba(255,45,120,0.3);
+}
+.theme-pink body, body.theme-pink {
+  background: linear-gradient(160deg, #fff0f7 0%, #fff5f8 40%, #ffe8f2 100%);
+}
+
+/* ネオン テーマ */
+.theme-neon {
+  --green: #00f5d4;
+  --green2: #00c4aa;
+  --green3: #7b2fff;
+  --green-pale: #0d1a2e;
+  --green-pale2: #0f1f35;
+  --bg: #080c1a;
+  --card: #0e1428;
+  --border: #1e2d4a;
+  --text: #e0f0ff;
+  --text2: #00f5d4;
+  --text3: #3a5070;
+  --red: #ff4060;
+  --red-pale: #1a0a14;
+  --yellow: #ffe600;
+  --yellow-pale: #1a1800;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.8), 0 0 12px rgba(0,245,212,0.08);
+  --shadow-btn: 0 4px 18px rgba(0,245,212,0.4);
+}
+body.theme-neon {
+  background: linear-gradient(160deg, #080c1a 0%, #0a0f20 50%, #0c0a1e 100%);
+}
+
 .dark-theme {
   --bg: #050e08;
   --card: #0c1a10;
@@ -153,6 +197,24 @@ body {
   background: linear-gradient(160deg, #0e1e14 0%, #0a1810 100%);
   border-color: #6ddd90;
 }
+.theme-pink .q-card {
+  background: linear-gradient(160deg, #ff2d78 0%, #ff6aa0 100%);
+  border-color: #d4005a;
+  box-shadow: 0 4px 24px rgba(255,45,120,0.25);
+}
+.theme-pink .q-card .card-txt,
+.theme-pink .q-card .creator-profile-badge,
+.theme-pink .q-card .badge-target,
+.theme-pink .q-card .card-menu-btn { color: #fff; }
+.theme-pink .q-card [style*="color:var(--green)"],
+.theme-pink .q-card [style*="color: var(--green)"] { color: #00c873 !important; }
+.theme-pink .q-card .creator-profile-badge { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.4); }
+.theme-pink .q-card .badge-target { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.35); color: #fff; }
+.theme-neon .q-card {
+  background: linear-gradient(160deg, #0e1428 0%, #0a1020 100%);
+  border-color: #00f5d4;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.7), 0 0 16px rgba(0,245,212,0.1);
+}
 .q-card.collapsed {
   max-height: 0 !important; padding: 0 18px !important; margin: 0 !important; opacity: 0 !important;
   transform: scale(0.85) translateY(-30px) !important; border-width: 0px !important; pointer-events: none;
@@ -161,6 +223,31 @@ body {
 .card-hdr { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; width: 100%; }
 .card-hdr-row1 { display: flex; justify-content: space-between; align-items: center; width: 100%; }
 .card-hdr-row2 { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* 3点メニュー */
+.card-menu-wrap { position: relative; }
+.card-menu-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 8px; color: var(--text3); font-size: 18px; line-height: 1; display: flex; align-items: center; transition: background 0.15s; }
+.card-menu-btn:hover { background: var(--green-pale); color: var(--text2); }
+.card-menu-dropdown { position: absolute; right: 0; top: 32px; background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.13); min-width: 170px; z-index: 200; overflow: hidden; opacity: 0; transform: scale(0.92) translateY(-6px); transform-origin: top right; transition: opacity 0.15s, transform 0.15s; pointer-events: none; }
+.card-menu-dropdown.open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
+.card-menu-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer; transition: background 0.1s; border: none; background: none; width: 100%; text-align: left; }
+.card-menu-item:hover { background: var(--green-pale); }
+.card-menu-item.danger { color: var(--red); }
+.card-menu-item.danger:hover { background: var(--red-pale); }
+.card-menu-item + .card-menu-item { border-top: 1px solid var(--border); }
+
+/* テーマ選択UI */
+.theme-selector-wrap { padding: 18px; }
+.theme-selector-title { font-size: 12px; font-weight: 800; color: var(--text3); margin-bottom: 12px; letter-spacing: 0.05em; }
+.theme-options { display: flex; gap: 10px; }
+.theme-option { flex: 1; border: 2.5px solid transparent; border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; background: var(--bg); }
+.theme-option:hover { transform: translateY(-2px); }
+.theme-option.active { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-pale); }
+.theme-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); }
+.theme-dot-green { background: linear-gradient(135deg, #00c873, #00e88a); }
+.theme-dot-pink { background: linear-gradient(135deg, #ff2d78, #ff6aa0); }
+.theme-dot-neon { background: linear-gradient(135deg, #080c1a, #00f5d4); border: 2px solid #00f5d4; }
+.theme-option span { font-size: 10px; font-weight: 800; color: var(--text2); }
 
 .creator-profile-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); padding: 4px 10px; border-radius: 20px; border: 1.2px solid var(--border); color: var(--text); font-weight: 800; font-size: 11px; }
 .creator-avatar-circle { width: 20px; height: 20px; border-radius: 50%; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; }
@@ -243,8 +330,12 @@ body {
 .combo-float-text {
   position: fixed; left: 50%; top: 48%; transform: translate(-50%, -50%) scale(0);
   font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif; font-weight: 900; color: #fff;
-  pointer-events: none; z-index: 610; opacity: 0; white-space: nowrap;
-  font-size: var(--combo-size, 42px); letter-spacing: -1px;
+  pointer-events: none; z-index: 610; opacity: 0;
+  white-space: nowrap;
+  font-size: clamp(28px, 11vw, 64px); letter-spacing: -1px;
+  max-width: 92vw;
+  overflow: hidden;
+  text-overflow: clip;
   -webkit-text-stroke: 2px #000;
   text-shadow: 1px 1px 0 #000, 2px 2px 0 #00c873, 3px 3px 0 #007a44, 0 8px 20px rgba(0,200,115,0.6);
 }
@@ -464,7 +555,27 @@ body {
   <div class="topbar-row">
     <div class="logo">ta<span class="logo-sq">²</span>tan</div>
     <div class="topbar-right">
-      <button class="theme-toggle-btn" onclick="toggleTheme()" title="テーマ切り替え">🌗</button>
+      <button class="theme-toggle-btn" onclick="toggleDarkMode()" id="dark-mode-btn" title="ダークモード">🌗</button>
+      <div style="position:relative;">
+        <button class="theme-toggle-btn" onclick="toggleThemeMenu(event)" title="きせかえ" id="theme-menu-btn">🎨</button>
+        <div id="theme-dropdown" style="display:none; position:absolute; right:0; top:42px; background:var(--card); border:1.5px solid var(--border); border-radius:18px; box-shadow:0 8px 28px rgba(0,0,0,0.15); z-index:300; padding:14px; min-width:220px;">
+          <div class="theme-selector-title">🎨 きせかえ</div>
+          <div class="theme-options">
+            <div class="theme-option active" id="theme-opt-default" onclick="applyTheme('default')">
+              <div class="theme-dot theme-dot-green"></div>
+              <span>デフォルト</span>
+            </div>
+            <div class="theme-option" id="theme-opt-pink" onclick="applyTheme('pink')">
+              <div class="theme-dot theme-dot-pink"></div>
+              <span>ピンク</span>
+            </div>
+            <div class="theme-option" id="theme-opt-neon" onclick="applyTheme('neon')">
+              <div class="theme-dot theme-dot-neon"></div>
+              <span>ネオン</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="topbar-avatar" id="topbar-avatar-display" onclick="switchTab('profile')">👤</div>
     </div>
   </div>
@@ -622,7 +733,7 @@ body {
 
         <div style="background:var(--green-pale); border-radius:8px; padding:10px; border:1px solid var(--border);">
           <label style="display:flex; align-items:center; gap:8px; font-size:11px; font-weight:800; color:var(--text2); cursor:pointer;">
-            <input type="checkbox" id="link-enabled-chk" onchange="toggleLinkInputs()"> 🔗 回答後にリンクへ自動遷移する
+            <input type="checkbox" id="link-enabled-chk" onchange="toggleLinkInputs()"> 🔗 オートリンクを設定（300maNei×人数）
           </label>
           <div id="link-inputs" style="display:none; flex-direction:column; gap:8px; margin-top:10px;">
             <div><div class="form-label">A案 リンクURL</div><input type="url" id="post-link-a" class="form-input" placeholder="https://"></div>
@@ -704,26 +815,41 @@ body {
     </div>
   </div>
 
+  <div style="margin-top:10px;">
+    <button onclick="document.getElementById('sim-panel').style.display=document.getElementById('sim-panel').style.display==='none'?'block':'none'" style="width:100%; padding:10px; background:var(--bg); border:1.5px dashed var(--border); border-radius:var(--r-sm); font-size:11px; font-weight:800; color:var(--text3); cursor:pointer; text-align:center;">⚙️ 運営シミュレーター（非公開）</button>
+    <div id="sim-panel" style="display:none;">
   <div class="simulator-box">
     <div class="sim-title"><span>⚙️ 運営専用：収支設計シミュレーター</span><span class="sim-admin-badge">Admin</span></div>
+
+    <!-- 単価設定 -->
     <div class="sim-row" style="background:#0f172a; padding:10px; border-radius:8px; margin-bottom:14px; border: 1px solid #334155;">
-      <div class="sim-header-row"><span style="color:var(--yellow)">📈 単発アンケート配信コスト (時価)</span><span id="sim-market-price-lbl" style="color:#38bdf8; font-weight:900;">100 maNei</span></div>
-      <input type="range" id="sim-market-price-slider" class="sim-slider" min="0" max="1000" step="10" value="100" oninput="updateMarketPriceSingle(this.value)">
+      <div class="sim-header-row"><span style="color:var(--yellow)">💰 企業単価（1回答あたり）</span><span id="sim-market-price-lbl" style="color:#38bdf8; font-weight:900;">100 maNei（¥1）</span></div>
+      <input type="range" id="sim-market-price-slider" class="sim-slider" min="0" max="10000" step="100" value="100" oninput="updateMarketPriceSingle(this.value)">
     </div>
+
+    <!-- 企業出稿数 -->
     <div class="sim-row">
-      <div class="sim-header-row"><span>1日の企業回答 (原価: 10円/1k maNei)</span><span id="sim-corp-lbl" style="color:#38bdf8">5問 (5,000maNei)</span></div>
-      <input type="range" id="sim-corp-slider" class="sim-slider" min="0" max="20" value="5" oninput="runSimulateObservation()">
+      <div class="sim-header-row"><span>🏢 企業出稿数（週）</span><span id="sim-corp-lbl" style="color:#38bdf8">5件</span></div>
+      <input type="range" id="sim-corp-slider" class="sim-slider" min="0" max="30" value="5" oninput="runSimulateObservation()">
     </div>
+
+    <!-- 1件あたり配布人数 -->
     <div class="sim-row">
-      <div class="sim-header-row"><span>1日のユーザー回答 (報酬: 100maNei)</span><span id="sim-user-lbl" style="color:#38bdf8">15問 (1,500maNei)</span></div>
-      <input type="range" id="sim-user-slider" class="sim-slider" min="0" max="40" value="15" oninput="runSimulateObservation()">
+      <div class="sim-header-row"><span>👥 1件あたり配布人数</span><span id="sim-dist-lbl" style="color:#38bdf8">50人</span></div>
+      <input type="range" id="sim-dist-slider" class="sim-slider" min="10" max="200" step="10" value="50" oninput="runSimulateObservation()">
     </div>
+
+    <!-- アクティブユーザー数 -->
     <div class="sim-row">
-      <div class="sim-header-row"><span>週の自己アンケート配信 (-時価/回)</span><span id="sim-post-lbl" style="color:#ff4d6d">2回 (-10,000maNei)</span></div>
-      <input type="range" id="sim-post-slider" class="sim-slider" min="0" max="7" value="2" oninput="runSimulateObservation()">
+      <div class="sim-header-row"><span>👤 アクティブユーザー数</span><span id="sim-user-lbl" style="color:#38bdf8">100人</span></div>
+      <input type="range" id="sim-user-slider" class="sim-slider" min="0" max="1000" step="10" value="100" oninput="runSimulateObservation()">
     </div>
+
+    <!-- 結果レポート -->
     <div class="sim-alert-box" id="sim-diagnostic-text">収支バランス観察中...</div>
   </div>
+  </div><!-- /sim-panel -->
+  </div><!-- /simulator wrapper -->
 
   <div class="section-title" style="margin-top: 14px;">💳 Stripe 現金化 (¥)</div>
   <div style="background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px;">
@@ -738,7 +864,7 @@ body {
   <div class="section-title" style="margin-top: 20px;">📝 あなたの回答履歴</div>
   <div class="history-filter-tabs">
     <button class="filter-btn active" id="hist-filter-all" onclick="setHistoryFilter('all')">すべて表示</button>
-    <button class="filter-btn" id="hist-filter-fav" onclick="setHistoryFilter('fav')">🩵 お気に入り</button>
+    <button class="filter-btn" id="hist-filter-fav" onclick="setHistoryFilter('fav')">♡ お気に入り</button>
   </div>
   <div id="view-history" style="display:flex; flex-direction:column; gap:16px;"></div>
 </div>
@@ -746,6 +872,29 @@ body {
 <div id="view-profile" class="tab-content">
   <div class="section-title" style="font-size: 15px; font-weight: 900;">👤 プロフィール設定</div>
   <p class="section-desc" style="font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.4;">アバターや興味・居住地を設定します。条件が合致したアンケートのみが自動配信されます。</p>
+
+  <!-- レベルカード -->
+  <div class="post-form-card" style="margin-bottom:12px; background:linear-gradient(135deg, #00c873 0%, #007a44 100%);">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:rgba(255,255,255,0.8); margin-bottom:2px;">総回答数</div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:900; color:#fff;" id="profile-total-answers">0</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px; font-weight:800; color:rgba(255,255,255,0.8); margin-bottom:2px;">LEVEL</div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:48px; font-weight:900; color:#fff; line-height:1;" id="profile-level">1</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:rgba(255,255,255,0.8); font-weight:700; margin-bottom:4px;">
+        <span>次のレベルまで</span>
+        <span id="profile-next-level-count">あと30回答</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.25); border-radius:10px; height:8px; overflow:hidden;">
+        <div id="profile-level-bar" style="background:#fff; height:100%; border-radius:10px; width:0%; transition:width 0.5s;"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="post-form-card" style="margin-bottom: 12px;">
     <div>
@@ -797,6 +946,17 @@ body {
         <input type="text" id="profile-city-input" class="form-input" placeholder="例: 渋谷区" oninput="updateProfileCity(this.value)">
       </div>
     </div>
+    <!-- オートリンク受信設定 -->
+    <div style="margin-top:16px; background:var(--green-pale); border:1.5px solid var(--border); border-radius:var(--r-sm); padding:14px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div>
+        <div style="font-size:13px; font-weight:900; color:var(--text);">🔗 オートリンク付きアンケートを受け取る</div>
+        <div style="font-size:11px; color:var(--green2); font-weight:700; margin-top:3px;">獲得maNei <span style="color:var(--green); font-size:13px;">3倍！</span>（300maNei/回答）</div>
+      </div>
+      <label style="position:relative; display:inline-block; width:46px; height:26px; flex-shrink:0;">
+        <input type="checkbox" id="autolink-receive-chk" checked style="opacity:0; width:0; height:0;">
+        <span onclick="toggleAutolinkReceive()" id="autolink-toggle-track" style="position:absolute; cursor:pointer; inset:0; background:var(--green); border-radius:26px; transition:0.3s;"><span id="autolink-toggle-thumb" style="position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; transform:translateX(20px);"></span></span>
+      </label>
+    </div>
   </div>
 </div>
 
@@ -817,6 +977,17 @@ const presetImages = {
 let userProfile = { name: "マイアカウント", avatar: "👤", avatarImage: null, age: "20代〜", hobbies: ["ライフスタイル"], state: "", city: "" };
 const avatarPool = ["👤", "🐱", "🐻", "🦊", "🐼", "🦁", "🤖", "👾", "👽", "🤠", "🎨", "🛍️", "👟", "🍟", "☕", "🚗", "📱", "🎮", "🎬"];
 const hobbyOptions = ["ガジェット", "グルメ", "ファッション", "ライフスタイル", "エンタメ", "ゲーム", "旅行", "スポーツ", "美容", "ビジネス", "アート", "音楽"];
+let autolinkReceive = true;
+function toggleAutolinkReceive() {
+  autolinkReceive = !autolinkReceive;
+  const chk = document.getElementById('autolink-receive-chk');
+  const track = document.getElementById('autolink-toggle-track');
+  const thumb = document.getElementById('autolink-toggle-thumb');
+  chk.checked = autolinkReceive;
+  track.style.background = autolinkReceive ? 'var(--green)' : 'var(--text3)';
+  thumb.style.transform = autolinkReceive ? 'translateX(20px)' : 'translateX(0)';
+}
+
 let marketPriceSingle = 100;
 let totalAnswerClicks = 0;
 
@@ -859,7 +1030,9 @@ const publicQuestions = [
 ];
 
 let kasegiEarned = 200000; let kasegiSpent = 0; let currentPoints = kasegiEarned - kasegiSpent;
-let mockData = [...initialQuestions]; const historyData = []; const myPostedQuestions = [];
+let mockData = [...initialQuestions]; const historyData = []; const myPostedQuestions = []; const favoritedCards = new Set();
+const SVG_HEART_ON  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="var(--green)" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-3px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+const SVG_HEART_OFF = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-3px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
 let activeFocusThread = null; let activeFocusStepIndex = 0;
 let activePostType = 'single'; let activePrivacy = 'private'; let threadQuestions = [{ text: '', optA: '', optB: '' }];
 let historyFilter = 'all';
@@ -867,9 +1040,64 @@ let historyFilter = 'all';
 let popupTimers = [];
 function clearPopupTimers() { popupTimers.forEach(id => clearTimeout(id)); popupTimers = []; }
 
+// レベル計算（数式：必要回答数 = 30 + レベル × 0.16）
+function calcLevel(totalAnswers) {
+  let level = 1;
+  let cumulative = 0;
+  while (level < 999) {
+    const needed = Math.ceil(30 + level * 0.16);
+    if (cumulative + needed > totalAnswers) break;
+    cumulative += needed;
+    level++;
+  }
+  const needed = Math.ceil(30 + level * 0.16);
+  const progress = totalAnswers - (totalAnswers - (totalAnswers - cumulative > 0 ? totalAnswers - cumulative : 0));
+  const currentInLevel = totalAnswers - cumulative;
+  const percent = Math.min(100, Math.round((currentInLevel / needed) * 100));
+  return { level, needed, currentInLevel, percent };
+}
+
+function updateLevelDisplay() {
+  const totalAnswers = totalAnswerClicks;
+  const { level, needed, currentInLevel, percent } = calcLevel(totalAnswers);
+  const levelEl = document.getElementById('profile-level');
+  const totalEl = document.getElementById('profile-total-answers');
+  const nextEl = document.getElementById('profile-next-level-count');
+  const barEl = document.getElementById('profile-level-bar');
+  if (levelEl) levelEl.textContent = level;
+  if (totalEl) totalEl.textContent = totalAnswers.toLocaleString();
+  if (nextEl) nextEl.textContent = level >= 999 ? 'MAX LEVEL' : `あと${needed - currentInLevel}回答`;
+  if (barEl) barEl.style.width = percent + '%';
+}
+
+let prevLevel = 1;
+function checkLevelUp() {
+  const { level } = calcLevel(totalAnswerClicks);
+  if (level > prevLevel) {
+    prevLevel = level;
+    showLevelUpPopup(level);
+  }
+}
+
+function showLevelUpPopup(level) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; z-index:999; padding:20px;';
+  wrap.innerHTML = `
+    <div style="background:linear-gradient(135deg,#00e088,#007a44); color:#fff; padding:32px 24px; border-radius:24px; width:100%; max-width:300px; text-align:center; box-shadow:0 10px 40px rgba(0,200,100,0.4);">
+      <div style="font-size:40px; margin-bottom:8px;">🎉</div>
+      <div style="font-size:13px; font-weight:800; opacity:0.85; margin-bottom:4px;">LEVEL UP!</div>
+      <div style="font-family:'Space Grotesk',sans-serif; font-size:72px; font-weight:900; line-height:1;">Lv.${level}</div>
+      <div style="font-size:12px; opacity:0.8; margin-top:8px;">おめでとうございます！</div>
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="margin-top:20px; background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.4); color:#fff; padding:12px 32px; border-radius:12px; font-size:14px; font-weight:800; cursor:pointer;">OK</button>
+    </div>`;
+  document.body.appendChild(wrap);
+  setTimeout(() => { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 4000);
+}
+
 window.onload = function() {
   updateDisplays(); renderAvatarSelector(); renderHobbyCheckboxes(); initProfileFormFields(); 
   renderTimeline(); renderHotList(); renderMyPostedList(); renderHistory(); initThreadFields(); runSimulateObservation();
+  document.getElementById('hist-filter-fav').innerHTML = SVG_HEART_ON + ' お気に入り';
 
   // スクロール監視：トップバーが隠れたらスティッキーバッジを表示
   const topbar = document.querySelector('.topbar');
@@ -947,7 +1175,7 @@ function updateProfileAge(val) { userProfile.age = val; renderTimeline(); }
 function updateProfileState(val) { userProfile.state = val.trim(); }
 function updateProfileCity(val) { userProfile.city = val.trim(); }
 
-function updateMarketPriceSingle(val) { marketPriceSingle = parseInt(val); document.getElementById('sim-market-price-lbl').textContent = `${marketPriceSingle.toLocaleString()} maNei`; updatePostCostIndicator(); runSimulateObservation(); }
+function updateMarketPriceSingle(val) { marketPriceSingle = parseInt(val); document.getElementById('sim-market-price-lbl').textContent = `${marketPriceSingle.toLocaleString()} maNei（¥${(marketPriceSingle * 0.01).toFixed(0)}）`; updatePostCostIndicator(); runSimulateObservation(); }
 function updateDisplays() {
   currentPoints = kasegiEarned - kasegiSpent; const yen = (currentPoints * 0.01).toFixed(2);
   document.getElementById('total-points').textContent = currentPoints.toLocaleString(); document.getElementById('total-yen').innerHTML = `≒ &yen;${yen}`;
@@ -956,6 +1184,8 @@ function updateDisplays() {
   let efficiency = kasegiEarned > 0 ? Math.round((currentPoints / kasegiEarned) * 100) : 100; if (efficiency < 0) efficiency = 0;
   document.getElementById('kasegi-efficiency').textContent = `${efficiency}%`; document.getElementById('kasegi-bar-fill').style.width = `${efficiency}%`;
   if(document.getElementById('profile-points')) document.getElementById('profile-points').textContent = currentPoints.toLocaleString();
+  updateLevelDisplay();
+  checkLevelUp();
   // スティッキーバッジ更新
   const sv = document.getElementById('sticky-manei-val');
   if (sv) sv.textContent = `${currentPoints.toLocaleString()} maNei`;
@@ -963,7 +1193,35 @@ function updateDisplays() {
 
 function executeCharge(amount) { kasegiEarned += amount; updateDisplays(); alertSimulateModal("チャージ完了", `チャージ手続きに成功しました。<br><b style="color:var(--green)">+${amount.toLocaleString()} maNei</b> があなたのアカウントに入金されました！⚡`); }
 function executeChargeWithPay(methodName) { kasegiEarned += 5000; updateDisplays(); alertSimulateModal("決済完了", `${methodName} 決済システムを起動し、チャージを実行しました。<br><b style="color:var(--green)">+5,000 maNei (¥50)</b> をチャージしました。`); }
-function toggleTheme() { document.body.classList.toggle('dark-theme'); }
+let currentTheme = 'default';
+let isDark = false;
+function toggleDarkMode() {
+  isDark = !isDark;
+  document.body.classList.toggle('dark-theme', isDark);
+  document.getElementById('dark-mode-btn').textContent = isDark ? '☀️' : '🌗';
+}
+function toggleThemeMenu(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('theme-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', () => {
+  const dd = document.getElementById('theme-dropdown');
+  if (dd) dd.style.display = 'none';
+});
+function applyTheme(theme) {
+  document.body.classList.remove('theme-pink', 'theme-neon');
+  // ダークモード状態は維持
+  document.body.classList.toggle('dark-theme', isDark);
+  ['default','pink','neon'].forEach(t => {
+    document.getElementById('theme-opt-' + t)?.classList.remove('active');
+  });
+  if (theme === 'pink') document.body.classList.add('theme-pink');
+  if (theme === 'neon') document.body.classList.add('theme-neon');
+  currentTheme = theme;
+  document.getElementById('theme-opt-' + theme)?.classList.add('active');
+  document.getElementById('theme-dropdown').style.display = 'none';
+}
 function toggleAgeChip(el) {
   const isAll = el.dataset.age === 'すべて';
   const group = document.getElementById('age-chip-group');
@@ -1000,6 +1258,7 @@ function setContentType(type) {
 function toggleLinkInputs() {
   const enabled = document.getElementById('link-enabled-chk').checked;
   document.getElementById('link-inputs').style.display = enabled ? 'flex' : 'none';
+  updatePostCostIndicator();
 }
 
 function setPostType(type) {
@@ -1009,16 +1268,17 @@ function setPostType(type) {
 }
 function updatePostCostIndicator() {
   const count = parseInt(document.getElementById('post-target-count')?.value) || 50;
-  const basePerQ = marketPriceSingle;
+  const hasLink = document.getElementById('link-enabled-chk')?.checked;
+  const basePerQ = marketPriceSingle * (hasLink ? 3 : 1);
   const baseCost = activePostType === 'single' ? basePerQ : threadQuestions.length * basePerQ;
   const totalCost = baseCost * count;
   document.getElementById('post-cost-indicator').textContent = `${totalCost.toLocaleString()} maNei`;
   const breakdown = document.getElementById('post-cost-breakdown');
   if (breakdown) {
     if (activePostType === 'single') {
-      breakdown.textContent = `${basePerQ.toLocaleString()} maNei × ${count.toLocaleString()}人`;
+      breakdown.textContent = `${basePerQ.toLocaleString()} maNei × ${count.toLocaleString()}人${hasLink ? '（リンク×3）' : ''}`;
     } else {
-      breakdown.textContent = `${basePerQ.toLocaleString()} maNei × ${threadQuestions.length}問 × ${count.toLocaleString()}人`;
+      breakdown.textContent = `${basePerQ.toLocaleString()} maNei × ${threadQuestions.length}問 × ${count.toLocaleString()}人${hasLink ? '（リンク×3）' : ''}`;
     }
   }
 }
@@ -1093,6 +1353,66 @@ function updateThreadData(index, field, value) { if (threadQuestions[index]) thr
 function setPrivacy(privacy) { activePrivacy = privacy; document.getElementById('privacy-private-btn').classList.toggle('selected', privacy === 'private'); document.getElementById('privacy-public-btn').classList.toggle('selected', privacy === 'public'); }
 function simulateThreeDaysPass() { mockData.forEach(q => { q.remainingPercent = 0; q.isExpired = true; }); renderTimeline(); alertSimulateModal("回答期限切れ(3日経過)シミュレーション", "3日の期限を過ぎたアンケートは、画面から消去（他のユーザーへ移譲）されました。"); }
 
+function toggleCardMenu(e, menuId) {
+  e.stopPropagation();
+  const menu = document.getElementById(menuId);
+  const isOpen = menu.classList.contains('open');
+  // 全部閉じる
+  document.querySelectorAll('.card-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+  if (!isOpen) menu.classList.add('open');
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.card-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+});
+
+function cardMenuPass(id) {
+  document.querySelectorAll('.card-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+  const card = document.getElementById(`qcard-${id}`);
+  if (card) {
+    card.style.transition = 'opacity 0.3s, transform 0.3s';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(60px)';
+    setTimeout(() => {
+      mockData = mockData.filter(q => q.id != id);
+      renderTimeline();
+    }, 300);
+  }
+}
+
+function cardMenuSave(id) {
+  document.querySelectorAll('.card-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+  const alreadyFaved = favoritedCards.has(id);
+  if (alreadyFaved) {
+    favoritedCards.delete(id);
+    // 履歴エントリとも同期
+    const hEntry = historyData.find(h => String(h.id) === String(id));
+    if (hEntry) hEntry.isFavorited = false;
+    alertSimulateModal(`${SVG_HEART_OFF} お気に入りを解除`, "お気に入りリストから削除しました。");
+  } else {
+    favoritedCards.add(id);
+    // 履歴エントリとも同期
+    const hEntry = historyData.find(h => String(h.id) === String(id));
+    if (hEntry) hEntry.isFavorited = true;
+    alertSimulateModal(`${SVG_HEART_ON} お気に入りに追加`, "このアンケートをお気に入りリストに追加しました。");
+  }
+  renderTimeline();
+  renderHistory();
+}
+
+function cardMenuReport(id) {
+  document.querySelectorAll('.card-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+  const card = document.getElementById(`qcard-${id}`);
+  if (card) {
+    card.style.transition = 'opacity 0.3s';
+    card.style.opacity = '0';
+    setTimeout(() => {
+      mockData = mockData.filter(q => q.id != id);
+      renderTimeline();
+      alertSimulateModal("🚩 通報しました", "このアンケートを運営に通報しました。ご協力ありがとうございます。");
+    }, 300);
+  }
+}
+
 function renderTimeline() {
   const tl = document.getElementById('timeline-cards-container'); tl.innerHTML = '';
   const currentReward = totalAnswerClicks >= 30 ? 1 : 100;
@@ -1106,7 +1426,8 @@ function renderTimeline() {
     return isAgeMatch && isHobbyMatch;
   });
 
-  // maNei低下警告バナー表示制御
+  // 残り期限が少ない順に並び替え
+  matchedQuestions.sort((a, b) => a.remainingPercent - b.remainingPercent);
   const warningBanner = document.getElementById('manei-warning-banner');
   if (warningBanner) warningBanner.classList.toggle('visible', totalAnswerClicks >= 30);
 
@@ -1147,6 +1468,10 @@ function renderTimeline() {
     const avatarContent = getAvatarHTML(q.creatorAvatar, q.creatorAvatarImage);
     const creatorName = q.sponsor || "マイアカウント";
     const creatorHTML = `<div class="creator-profile-badge"><div class="creator-avatar-circle">${avatarContent}</div><span>${creatorName}</span></div>`;
+    const isFaved = favoritedCards.has(q.id);
+    const favLabel = isFaved ? `${SVG_HEART_ON} お気に入り済み` : `${SVG_HEART_OFF} お気に入り`;
+    const favClass = isFaved ? 'card-menu-item' : 'card-menu-item';
+    const menuHTML = `<div class="card-menu-wrap"><button class="card-menu-btn" onclick="toggleCardMenu(event,'menu-${q.id}')">⋮</button><div class="card-menu-dropdown" id="menu-${q.id}"><button class="card-menu-item" onclick="cardMenuPass(${q.id})">⏭️ 次の人へ回す</button><button class="${favClass}" onclick="cardMenuSave(${q.id})">${favLabel}</button><button class="card-menu-item danger" onclick="cardMenuReport(${q.id})">🚩 通報する</button></div></div>`;
 
     let cardDiv = document.createElement('div');
     cardDiv.className = 'q-card';
@@ -1156,7 +1481,7 @@ function renderTimeline() {
       const stepDots = q.steps.map((_, i) => `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${i===0?'var(--green)':'var(--border)'}; margin-right:3px;"></span>`).join('');
       cardDiv.innerHTML = `
         <div class="card-hdr">
-          <div class="card-hdr-row1">${creatorHTML}<div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward * q.steps.length}maNei</div></div>
+          <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; align-items:center; gap:6px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward * q.steps.length}maNei</div>${menuHTML}</div></div>
           <div class="card-hdr-row2">
             ${targetHTML}
             <span style="background:linear-gradient(135deg,#8b5cf6,#6366f1); color:#fff; font-size:10px; font-weight:900; padding:3px 10px; border-radius:12px;">📋 ${q.steps.length}問セット</span>
@@ -1175,7 +1500,7 @@ function renderTimeline() {
       if (q.type === 'text') {
         cardDiv.innerHTML = `
           <div class="card-hdr">
-            <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward}maNei</div><span style="background:var(--green-pale); color:var(--green2); font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; border:1px solid var(--border);">📝 テキスト</span></div></div>
+            <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; align-items:center; gap:6px;"><div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward}maNei</div><span style="background:var(--green-pale); color:var(--green2); font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; border:1px solid var(--border);">📝 テキスト</span></div>${menuHTML}</div></div>
             <div class="card-hdr-row2">${targetHTML}</div>
           </div>
           <div class="card-txt">${q.text}</div>
@@ -1188,7 +1513,7 @@ function renderTimeline() {
       } else {
         cardDiv.innerHTML = `
           <div class="card-hdr">
-            <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward}maNei</div><span style="background:#fff8e6; color:#b07a00; font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; border:1px solid #ffe09a;">🖼️ 画像</span></div></div>
+            <div class="card-hdr-row1">${creatorHTML}<div style="display:flex; align-items:center; gap:6px;"><div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;"><div style="color:var(--green); font-weight:800; font-size:13px;">+${currentReward}maNei</div><span style="background:#fff8e6; color:#b07a00; font-size:9px; font-weight:800; padding:2px 7px; border-radius:8px; border:1px solid #ffe09a;">🖼️ 画像</span></div>${menuHTML}</div></div>
             <div class="card-hdr-row2">${targetHTML}</div>
           </div>
           <div class="card-txt">${q.text}</div>
@@ -1326,7 +1651,7 @@ function submitThreadFocusChoice(choiceType) {
   }
 }
 function saveStepToHistory(qObj, stepIndex, choiceStr, reward) {
-  historyData.unshift({ id: qObj.id + `_step_${stepIndex}`, sponsor: qObj.sponsor, text: `[スレッド第${stepIndex + 1}問] ${qObj.steps[stepIndex].text}`, userChoice: choiceStr, reward: reward, isFavorited: false, daysElapsed: 0, answeredAt: new Date().toLocaleString('ja-JP') });
+  historyData.unshift({ id: qObj.id + `_step_${stepIndex}`, sponsor: qObj.sponsor, text: `[スレッド第${stepIndex + 1}問] ${qObj.steps[stepIndex].text}`, userChoice: choiceStr, reward: reward, isFavorited: favoritedCards.has(qObj.id), daysElapsed: 0, answeredAt: new Date().toLocaleString('ja-JP') });
 }
 function submitChoice(id, userChoiceStr, choiceType) {
   const qObj = mockData.find(item => item.id === id); if (!qObj || qObj.isExpired) return;
@@ -1334,7 +1659,7 @@ function submitChoice(id, userChoiceStr, choiceType) {
   const selfPost = myPostedQuestions.find(p => p.id === id); if (selfPost) { if (choiceType === 'A') selfPost.votesA++; else selfPost.votesB++; }
   const card = document.getElementById(`qcard-${id}`); if (card) card.classList.add('collapsed');
   const rewardMoney = totalAnswerClicks >= 30 ? 1 : 100;
-  historyData.unshift({ id: qObj.id, sponsor: qObj.sponsor, text: qObj.text, userChoice: userChoiceStr, reward: rewardMoney, isFavorited: false, daysElapsed: 0, answeredAt: new Date().toLocaleString('ja-JP') });
+  historyData.unshift({ id: qObj.id, sponsor: qObj.sponsor, text: qObj.text, userChoice: userChoiceStr, reward: rewardMoney, isFavorited: favoritedCards.has(qObj.id), daysElapsed: 0, answeredAt: new Date().toLocaleString('ja-JP') });
   setTimeout(() => { removeQuestionFromTimeline(id); }, 400);
   totalAnswerClicks++; let step = totalAnswerClicks % 3 === 0 ? 3 : totalAnswerClicks % 3; let cycle = Math.ceil(totalAnswerClicks / 3);
   let bonus = (cycle === 10 && step === 3) ? (totalAnswerClicks > 30 ? 10 : 1000) : 0; kasegiEarned += (rewardMoney + bonus); updateDisplays();
@@ -1364,9 +1689,9 @@ function triggerPopups(step, cycle, base, bonus, isLastStep = false, threadCompl
     else { shakeEl.classList.add('shake-light'); }
   }
   
-  comboEl.style.setProperty('--combo-size', Math.min(42 + (cycle * 4), 80) + "px");
+  comboEl.style.setProperty('--combo-size', Math.min(42 + (cycle * 3), 64) + "px");
   let ptsText = `+${(base + bonus + threadCompleteBonus).toLocaleString()}maNei`;
-  if (isLastStep && threadCompleteBonus > 0) ptsText += `<div class="rainbow-text" style="font-size:clamp(12px, 4.5vw, 22px); margin-top:10px; font-weight:900; text-align:center; line-height:1.4; white-space:nowrap;">+ THREAD COMPLETE BONUS!</div>`;
+  if (isLastStep && threadCompleteBonus > 0) ptsText += `<div class="rainbow-text" style="font-size:clamp(20px, 8vw, 36px); margin-top:10px; font-weight:900; text-align:center; line-height:1.4; white-space:nowrap;">+ THREAD COMPLETE BONUS!</div>`;
   const wordLabel = step === 3 ? "tan!" : step === 2 ? "ta²!" : "ta!";
   rWordEl.innerHTML = wordLabel;
   rPtsEl.innerHTML = (step === 3 && cycle === 10) ? (isLastStep ? ptsText : `+${base.toLocaleString()}maNei & BONUS +${bonus.toLocaleString()}maNei!`) : ptsText;
@@ -1433,9 +1758,24 @@ function confirmNewQuestion() {
   document.getElementById('confirm-ok-btn').onclick = () => { document.body.removeChild(wrap); submitNewQuestion(); };
 }
 
+function hasRacialPairConflict(optA, optB) {
+  const blockedPairs = [['白人','黒人']];
+  return blockedPairs.some(([x, y]) => {
+    const a = optA, b = optB;
+    return (a.includes(x) && b.includes(y)) || (a.includes(y) && b.includes(x));
+  });
+}
+
 function submitNewQuestion() {
   if (!document.getElementById('cost-consent-chk').checked) { alertSimulateModal("ポリシー同意エラー", "配信コストポリシーに同意する必要があります。"); return; }
   let cost = 0; const sponsor = userProfile.name; const privacy = activePrivacy; const scope = "both"; const expireDays = parseInt(document.getElementById('post-expire-days').value);
+  const hasLink = document.getElementById('link-enabled-chk')?.checked;
+  const pricePerQ = marketPriceSingle * (hasLink ? 3 : 1);
+  if (hasLink) {
+    const linkA = document.getElementById('post-link-a')?.value.trim();
+    const linkB = document.getElementById('post-link-b')?.value.trim();
+    if (!linkA && !linkB) { alertSimulateModal("⚠️ リンク未入力", "オートリンクを設定する場合、A案またはB案のURLを入力してください。"); return; }
+  }
   const ageChips = [...document.querySelectorAll('#age-chip-group .chip-btn.selected')].map(b => b.dataset.age);
   const hobbyChips = [...document.querySelectorAll('#hobby-chip-group .chip-btn.selected')].map(b => b.dataset.hobby);
   const targetAge = ageChips.length === 1 ? ageChips[0] : ageChips.join(',');
@@ -1444,23 +1784,26 @@ function submitNewQuestion() {
   let newObj = { id: newId, sponsor: sponsor, isCorporate: false, creatorAvatar: userProfile.avatar, creatorAvatarImage: userProfile.avatarImage, privacy: privacy, scope: scope, votesA: 0, votesB: 0, expireDays: expireDays, remainingPercent: 100, isExpired: false, targetAge: targetAge, targetHobby: targetHobby, isUserCreated: true, isMyPost: true };
   if (activePostType === 'single') {
     const postCount = parseInt(document.getElementById('post-target-count')?.value) || 50;
-    cost = marketPriceSingle * postCount; const qText = document.getElementById('post-q-text').value.trim(); if (!qText) { alertSimulateModal("入力エラー", "質問テキストを入力してください。"); return; }
+    cost = pricePerQ * postCount; const qText = document.getElementById('post-q-text').value.trim(); if (!qText) { alertSimulateModal("入力エラー", "質問テキストを入力してください。"); return; }
     const optA = document.getElementById('post-opt-a').value.trim();
     const optB = document.getElementById('post-opt-b').value.trim();
     if (!optA || !optB) { alertSimulateModal("入力エラー", "A案・B案の選択肢を入力してください。"); return; }
+    if (hasRacialPairConflict(optA, optB)) { alertSimulateModal("⚠️ 投稿できません", "人種を対立させる2択は、ta²tanのガイドラインにより投稿できません。"); return; }
     newObj.isThread = false; newObj.type = 'text'; newObj.text = qText; newObj.options = [optA, optB];
   } else {
     const validQuestions = threadQuestions.filter(q => q.text.trim() !== "");
     if (validQuestions.length === 0) { alertSimulateModal("入力エラー", "スレッド有効質問を入力してください。"); return; }
     const emptyOptions = validQuestions.findIndex(q => !q.optA?.trim() || !q.optB?.trim());
     if (emptyOptions !== -1) { alertSimulateModal("入力エラー", `スレッド質問 ${emptyOptions + 1} のA案・B案を入力してください。`); return; }
+    const racialConflict = validQuestions.findIndex(q => hasRacialPairConflict(q.optA, q.optB));
+    if (racialConflict !== -1) { alertSimulateModal("⚠️ 投稿できません", `スレッド質問 ${racialConflict + 1} に人種を対立させる2択が含まれています。ta²tanのガイドラインにより投稿できません。`); return; }
     const postCount = parseInt(document.getElementById('post-target-count')?.value) || 50;
     if (validQuestions.length === 1) {
       // 1問だけの場合はシングルとして投稿
-      cost = marketPriceSingle * postCount;
+      cost = pricePerQ * postCount;
       newObj.isThread = false; newObj.type = 'text'; newObj.text = validQuestions[0].text; newObj.options = [validQuestions[0].optA, validQuestions[0].optB];
     } else {
-      cost = validQuestions.length * marketPriceSingle * postCount; newObj.isThread = true; newObj.type = 'thread'; newObj.steps = validQuestions.map(q => ({ text: q.text, options: [q.optA, q.optB] })); newObj.currentStepIndex = 0; newObj.votesList = validQuestions.map(() => ({ votesA: 0, votesB: 0 }));
+      cost = validQuestions.length * pricePerQ * postCount; newObj.isThread = true; newObj.type = 'thread'; newObj.steps = validQuestions.map(q => ({ text: q.text, options: [q.optA, q.optB] })); newObj.currentStepIndex = 0; newObj.votesList = validQuestions.map(() => ({ votesA: 0, votesB: 0 }));
     }
   }
   if (currentPoints < cost) { alertSimulateModal("maNei不足", `アンケート配布には ${cost.toLocaleString()}maNei 必要ですが、現在 ${currentPoints.toLocaleString()}maNei を保有しています。`); return; }
@@ -1523,14 +1866,23 @@ function renderMyPostedList() {
 
 function setHistoryFilter(filter) { historyFilter = filter; document.getElementById('hist-filter-all').classList.toggle('active', filter === 'all'); document.getElementById('hist-filter-fav').classList.toggle('active', filter === 'fav'); renderHistory(); }
 function simulateThirtyDaysPass() { historyData.forEach(h => { h.daysElapsed += 30; }); renderHistory(); alertSimulateModal("30日経過シミュレーション", "30日が経過しました。お気に入り保護のない履歴アンケートのみ自動で消滅・クリーニングされました。"); }
-function toggleFav(id) { const target = historyData.find(h => String(h.id) === String(id)); if (target) { target.isFavorited = !target.isFavorited; } renderHistory(); }
+function toggleFav(id) {
+  const target = historyData.find(h => String(h.id) === String(id));
+  if (target) {
+    target.isFavorited = !target.isFavorited;
+    if (target.isFavorited) favoritedCards.add(target.id);
+    else favoritedCards.delete(target.id);
+  }
+  renderHistory();
+  renderTimeline();
+}
 
 function renderHistory() {
   const container = document.getElementById('view-history');
   const activeHistory = historyData.filter(h => { if (h.daysElapsed < 30 || h.isFavorited) { return historyFilter === 'fav' ? h.isFavorited : true; } return false; });
   if (activeHistory.length === 0) { container.innerHTML = `<div style="text-align:center; color:var(--text3); font-size:12px; padding:24px 0;" id="empty-history">履歴はありません。</div>`; return; }
   container.innerHTML = activeHistory.map(h => {
-    let commentHTML = h.comment ? `<div style="font-size:12px; background:var(--green-pale); padding:10px; border-radius:8px; margin-top:10px; font-weight:500; width:100%;"><b style="color:var(--green2);">📝 コメント:</b><br>${escapeHTML(h.comment)}</div>` : `<div class="comment-section" id="comsect-${h.id}"><button class="comment-trigger" onclick="openCommentBox('${h.id}')">コメントを120文字で残す(任意)</button><button class="fav-btn ${h.isFavorited ? 'active' : ''}" onclick="toggleFav('${h.id}')" title="お気に入り保護">${h.isFavorited ? '🩵' : '🤍'}</button></div>`;
+    let commentHTML = h.comment ? `<div style="font-size:12px; background:var(--green-pale); padding:10px; border-radius:8px; margin-top:10px; font-weight:500; width:100%;"><b style="color:var(--green2);">📝 コメント:</b><br>${escapeHTML(h.comment)}</div>` : `<div class="comment-section" id="comsect-${h.id}"><button class="comment-trigger" onclick="openCommentBox('${h.id}')">コメントを120文字で残す(任意)</button><button class="fav-btn ${h.isFavorited ? 'active' : ''}" onclick="toggleFav('${h.id}')" title="お気に入り保護">${h.isFavorited ? SVG_HEART_ON : SVG_HEART_OFF}</button></div>`;
     const elapsedText = h.daysElapsed >= 30 ? `(お気に入り保護中 - ${h.daysElapsed}日経過)` : `(自動消滅まであと ${30 - h.daysElapsed} 日)`;
     return `
       <div class="history-card" style="background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:20px; margin-bottom:10px; box-shadow:var(--shadow-card);">
@@ -1550,15 +1902,36 @@ function updateCharCount(id) { const input = document.getElementById(`input-${id
 function submitComment(id) { const input = document.getElementById(`input-${id}`); const val = input ? input.value.trim() : ""; const target = historyData.find(h => String(h.id) === String(id)); if (target) target.comment = val; renderHistory(); }
 
 function runSimulateObservation() {
-  const corpVal = parseInt(document.getElementById('sim-corp-slider').value); const userVal = parseInt(document.getElementById('sim-user-slider').value); const postVal = parseInt(document.getElementById('sim-post-slider').value);
-  document.getElementById('sim-corp-lbl').textContent = `${corpVal}問 (+${(corpVal * 1000).toLocaleString()}maNei)`; document.getElementById('sim-user-lbl').textContent = `${userVal}問 (+${(userVal * 100).toLocaleString()}maNei)`; document.getElementById('sim-post-lbl').textContent = `${postVal}回 (-${(postVal * marketPriceSingle).toLocaleString()}maNei)`;
-  const netWeeklyBalance = ((corpVal * 1000) + (userVal * 100)) * 7 - (postVal * marketPriceSingle);
+  const corpCount = parseInt(document.getElementById('sim-corp-slider').value);
+  const distCount = parseInt(document.getElementById('sim-dist-slider').value);
+  const userCount = parseInt(document.getElementById('sim-user-slider').value);
+  const unitPrice = marketPriceSingle; // maNei
+  const unitYen = unitPrice * 0.01; // ¥
+
+  document.getElementById('sim-corp-lbl').textContent = `${corpCount}件`;
+  document.getElementById('sim-dist-lbl').textContent = `${distCount}人`;
+  document.getElementById('sim-user-lbl').textContent = `${userCount}人`;
+
+  // 週の計算（企業単価はmaNei、回答者報酬は100maNei=¥1固定）
+  const weeklyRevenue = corpCount * distCount * unitYen; // 企業からの売上（¥）
+  const weeklyReward = corpCount * distCount * 1; // 回答者への還元（¥1固定/回答）
+  const weeklyStripe = weeklyRevenue * 0.036; // Stripe手数料
+  const weeklyProfit = weeklyRevenue - weeklyReward - weeklyStripe;
+  const monthlyProfit = weeklyProfit * 4;
+  const yearlyProfit = weeklyProfit * 52;
+
   const diag = document.getElementById('sim-diagnostic-text');
-  let diagnostics = `<b>📊 運営試算レポート (非公開メモ):</b><br>週の収支: <b style="color:#38bdf8">+${netWeeklyBalance.toLocaleString()}maNei (≒ ¥${(netWeeklyBalance * 0.01).toFixed(2)}円) / 週</b><br>`;
-  if (netWeeklyBalance >= 35000) diagnostics += `<span style="color:#ff4d6d; font-weight:800;">⚠️ 要収支観察: 週¥350以上貯まるハイペース。企業案件供給と回答権移譲のバランスが鍵です。</span>`;
-  else if (netWeeklyBalance >= 7000) diagnostics += `<span style="color:#00c873; font-weight:800;">✅ 適正収支: 持続可能な設計バランスです。</span>`;
-  else diagnostics += `<span style="color:#e2b714; font-weight:800;">💡 ローペース: 獲得に対して配信頻度が勝っています。ユーザー回答ボリュームを増やすことで最適化されます。</span>`;
-  diag.innerHTML = diagnostics;
+  diag.innerHTML = `
+    <b>📊 運営収支レポート（非公開）</b><br><br>
+    <span style="color:#94a3b8;">週の企業売上:</span> <b style="color:#38bdf8;">¥${Math.round(weeklyRevenue).toLocaleString()}</b><br>
+    <span style="color:#94a3b8;">週の回答者還元:</span> <b style="color:#ff4d6d;">−¥${Math.round(weeklyReward).toLocaleString()}</b><br>
+    <span style="color:#94a3b8;">Stripe手数料(3.6%):</span> <b style="color:#ff4d6d;">−¥${Math.round(weeklyStripe).toLocaleString()}</b><br>
+    <hr style="border-color:#334155; margin:8px 0;">
+    <span style="color:#94a3b8;">週の運営利益:</span> <b style="color:#00e088; font-size:14px;">¥${Math.round(weeklyProfit).toLocaleString()}</b><br>
+    <span style="color:#94a3b8;">月の運営利益:</span> <b style="color:#00e088; font-size:14px;">¥${Math.round(monthlyProfit).toLocaleString()}</b><br>
+    <span style="color:#94a3b8;">年の運営利益:</span> <b style="color:#00e088; font-size:16px;">¥${Math.round(yearlyProfit).toLocaleString()}</b><br>
+    ${weeklyProfit >= 100000 ? '<br><span style="color:#00c873; font-weight:800;">✅ 月10万円超。独立ライン到達！</span>' : weeklyProfit >= 40000 ? '<br><span style="color:#e2b714; font-weight:800;">📈 もう少しで独立ライン。企業を増やしましょう。</span>' : '<br><span style="color:#94a3b8;">💡 企業数・配布人数を増やすと利益が伸びます。</span>'}
+  `;
 }
 
 function switchTab(tabId) {
